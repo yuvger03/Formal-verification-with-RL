@@ -75,7 +75,7 @@ class Q_Learning:
 
 
             if (episode%2000==0) and episode>0 and self.useNusmv==1:
-                writeSmv(SIZE, maxSteps ,self.q_table, self.env.get_holes())
+                writeSmv(SIZE, maxSteps ,self.q_table, self.env.get_holes(),index= index)
                 answer=runSmv()
                 
                     

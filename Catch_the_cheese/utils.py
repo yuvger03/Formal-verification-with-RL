@@ -100,8 +100,8 @@ def writePlayer(filename, listOfHoles, currentOptimal, Q):
 
 
 # main function of writing the smv file
-def writeSmv(SIZE, currentOptimal, Q, listOfHoles):
-    filename_main = 'tests/test_t1.smv'
+def writeSmv(SIZE, currentOptimal, Q, listOfHoles,index):
+    filename_main = f"tests/test_t1_{index}.smv"
     if os.path.exists(filename_main):
         os.remove(filename_main)
     with open(filename_main, 'w') as fw:

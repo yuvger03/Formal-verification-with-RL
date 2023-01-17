@@ -12,7 +12,7 @@ import parameters_run
 
 # need to change size only on envioremnt, and utils (if used)
 
-def main(p, learning_rate):
+def main(p, learning_rate,index):
     # currently you can check 2 sizes an build graph for both together
     size1 = 10
     size2 = 20
@@ -27,7 +27,7 @@ def main(p, learning_rate):
     DictResults["Did not converged ,with NuXmv"] = 0
     DictResults["Converged ,without NuXmv"] = 0
     DictResults["Did not converged,without NuXmv"] = 0
-    num_games = 10
+    num_games = 50
     switch = int(num_games) # switch between with and without nuxmv
 
     results = open("./results.csv", 'a')
@@ -48,7 +48,7 @@ def main(p, learning_rate):
             if i >= switch:
                 q_learning_algo.setuseNusmv(0)
 
-            q_learning_algo.run_algorithm(p)
+            q_learning_algo.run_algorithm(p,index)
 
             Q = q_learning_algo.getQ()
             H = frozen_lake_environment.get_holes()
@@ -108,6 +108,6 @@ if __name__ == '__main__':
     start_time = time.time()
     prob = sys.argv[1]
     learning_rate = sys.argv[2]
-    main(float(prob), float(learning_rate))
+    main(float(prob), float(learning_rate), int(sys.argv[3]))
     print(float(prob))
     print("time:" + str(time.time() - start_time))

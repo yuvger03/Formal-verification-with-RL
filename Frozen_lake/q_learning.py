@@ -35,7 +35,7 @@ class Q_Learning:
         return self.q_table
     def setuseNusmv(self,value):
          self.useNusmv=value
-    def run_algorithm(self,probability):
+    def run_algorithm(self,probability,index):
         #FLAG_win shows wheter smv found a solution or not and what solution
         FLAG_win=False
         #maxSteps shows which number of steps we need to take to win 
@@ -81,8 +81,8 @@ class Q_Learning:
 
 
             if (episode%100==0) and episode>0 and self.useNusmv==1:
-                writeSmv(self.SIZE, maxSteps ,self.q_table, self.env.get_holes())
-                answer=runSmv()
+                writeSmv(self.SIZE, maxSteps ,self.q_table, self.env.get_holes(),index= index)
+                answer=runSmv(index)
                 
                 if answer[1]==False:
                     self.q_table[answer[2]][answer[3]]= self.q_table[answer[2]][answer[3]]-1000
@@ -140,13 +140,13 @@ class Q_Learning:
             if self.bigChange<=self.epsilon :
                 break
     
-    def print_results(self):
+    def print_results(self,index):
         print('big Change')
         print('{:010.10f}'.format(self.bigChange))
         print('Episodes')
         print(self.episodes)
-        writeSmv(self.SIZE, 10000 ,self.q_table, self.env.get_holes())
-        answer=runSmv()
+        writeSmv(self.SIZE, 10000 ,self.q_table, self.env.get_holes(),index= index)
+        answer=runSmv(index)
                 
         if answer[1]==True:
          print("found something ", len(answer[0]))
