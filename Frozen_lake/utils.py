@@ -146,13 +146,13 @@ def writeSmv(SIZE, currentOptimal, Q, listOfHoles, index):
     if os.path.exists(filename_main):
         os.remove(filename_main)
     with open(filename_main, 'w') as fw:
-        filename_start = f'tests/add_start_{1}{SIZE}.txt'
+        filename_start = f'tests/add_start_{1}{SIZE}{index}.txt'
         writeStart(filename_start)
         with open(filename_start, 'r') as fr:
             for line in fr:
                 fw.write(line)
 
-        filename_player = f'tests/{1}playersnextC{SIZE}.txt'
+        filename_player = f'tests/{1}playersnextC{SIZE}{index}.txt'
         writePlayer(filename_player, listOfHoles, currentOptimal, Q)
         with open(filename_player, 'r') as fr:
             for line in fr:
@@ -164,7 +164,7 @@ def runSmv(index):
     SIZE=parameters_run.get_size()
     smv_file = f'test_t1_{index}.smv'
     os.chdir('tests')
-    output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines()
+    output = subprocess.check_output([f'nuXmv {smv_file}'], shell=True).splitlines()
     os.chdir('../')
     ans = str(output[26][47:])[2:]
     ans = ans[0:len(ans) - 1]
