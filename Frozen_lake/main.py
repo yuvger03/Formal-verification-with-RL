@@ -12,7 +12,7 @@ import parameters_run
 
 # need to change size only on envioremnt, and utils (if used)
 
-def main(p, learning_rate,index):
+def main(p, learning_rate,index, dicountFcator):
     # currently you can check 2 sizes an build graph for both together
     size1 = 10
     size2 = 20
@@ -42,7 +42,7 @@ def main(p, learning_rate,index):
             parameters_run.set_size(size2)
         for i in range(num_games):
             frozen_lake_environment = Environment()
-            q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate)
+            q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, dicountFcator)
             if i < switch:
                 q_learning_algo.setuseNusmv(1)
             if i >= switch:
@@ -107,7 +107,8 @@ def main(p, learning_rate,index):
 if __name__ == '__main__':
     start_time = time.time()
     prob = sys.argv[1]
-    learning_rate = sys.argv[2]
-    main(float(prob), float(learning_rate), int(sys.argv[3]))
+    discount_rate = sys.argv[2]
+    learning_rate = 0.14
+    main(float(prob), float(learning_rate), int(sys.argv[3]), float(sys.argv[2]))
     print(float(prob))
     print("time:" + str(time.time() - start_time))

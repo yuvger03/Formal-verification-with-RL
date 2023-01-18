@@ -11,14 +11,14 @@ import parameters_run
 # probability = 0.99
 class Q_Learning:
 
-    def __init__(self, environment,learning_rate, **parameters):
+    def __init__(self, environment,learning_rate,discount_rate, **parameters):
         self.SIZE=parameters_run.get_size()
         self.env = environment
 
         self.num_episodes = parameters.get('num_episodes', self.SIZE*1000)
         self.max_steps_per_episode = parameters.get('max_steps_per_episode', self.SIZE*self.SIZE)
         self.learning_rate = parameters.get('learning_rate', learning_rate)
-        self.discount_rate = parameters.get('discount_rate', 0.99)
+        self.discount_rate = parameters.get('discount_rate', discount_rate)
         self.exploration_rate = parameters.get('exploration_rate', 1)
         self.max_exploration_rate = parameters.get('max_exploration_rate', 1)
         self.min_exploration_rate = parameters.get('min_exploration_rate', 0.01)
