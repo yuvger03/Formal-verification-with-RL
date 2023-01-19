@@ -106,8 +106,9 @@ def main(p, learning_rate, index, discount_factor):
 if __name__ == '__main__':
     start_time = time.time()
     prob = sys.argv[1]
-    discount_rate = sys.argv[2]
+    discount_rate = 0.92
     alpha = 0.2  # learning rate
-    main(float(prob), float(alpha), int(sys.argv[3]), float(sys.argv[2]))
+    index = sys.argv[2]
+    main(float(prob), float(alpha), index, discount_factor=discount_rate)
     print(float(prob))
     print("time:" + str(time.time() - start_time))
