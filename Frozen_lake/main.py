@@ -12,7 +12,7 @@ import parameters_run
 
 # need to change size only on envioremnt, and utils (if used)
 
-def main(p, learning_rate,index, dicountFcator):
+def main(p, learning_rate, index, discount_factor):
     # currently you can check 2 sizes an build graph for both together
     size1 = 10
     size2 = 20
@@ -28,11 +28,11 @@ def main(p, learning_rate,index, dicountFcator):
     DictResults["Converged ,without NuXmv"] = 0
     DictResults["Did not converged,without NuXmv"] = 0
     num_games = 50
-    switch = int(num_games) # switch between with and without nuxmv
+    switch = int(num_games)  # switch between with and without nuxmv
 
     results = open("./results.csv", 'a')
     writer = csv.writer(results)
-    writer.writerow(["size", "p", "learning_rate", "with_nuxmv", "without_nuxmv"])
+    writer.writerow(["size", "p", "learning_rate", "discount_factor", "with_nuxmv", "without_nuxmv"])
 
     for s in range(2):
         if s == 0:
@@ -42,13 +42,13 @@ def main(p, learning_rate,index, dicountFcator):
             parameters_run.set_size(size2)
         for i in range(num_games):
             frozen_lake_environment = Environment()
-            q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, dicountFcator)
+            q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, discount_factor)
             if i < switch:
                 q_learning_algo.setuseNusmv(1)
             if i >= switch:
                 q_learning_algo.setuseNusmv(0)
 
-            q_learning_algo.run_algorithm(p,index)
+            q_learning_algo.run_algorithm(p, index)
 
             Q = q_learning_algo.getQ()
             H = frozen_lake_environment.get_holes()
@@ -81,11 +81,10 @@ def main(p, learning_rate,index, dicountFcator):
                     size20[0] += 1
                 with_nuxmv.append(e)
         if s == 0:
-            writer.writerow([parameters_run.get_size(), p, learning_rate, size10[0], size10[2]])
+            writer.writerow([parameters_run.get_size(), p, learning_rate, discount_factor, size10[0], size10[2]])
         if s == 1:
-            writer.writerow([parameters_run.get_size(), p, learning_rate, size20[0], size20[2]])
+            writer.writerow([parameters_run.get_size(), p, learning_rate, discount_factor, size20[0], size20[2]])
     results.close()
-
 
     print("with nuxmv:", with_nuxmv)
     print("without nuxmv:", without_nuxmv)
@@ -108,7 +107,7 @@ if __name__ == '__main__':
     start_time = time.time()
     prob = sys.argv[1]
     discount_rate = sys.argv[2]
-    learning_rate = 0.14
-    main(float(prob), float(learning_rate), int(sys.argv[3]), float(sys.argv[2]))
+    alpha = 0.2  # learning rate
+    main(float(prob), float(alpha), int(sys.argv[3]), float(sys.argv[2]))
     print(float(prob))
     print("time:" + str(time.time() - start_time))
