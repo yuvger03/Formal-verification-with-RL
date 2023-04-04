@@ -3,7 +3,7 @@
 import numpy as np
 import random
 import time
-from utils import runSmv, writeSmv
+from utils import runSmv, writeSmv, writePrism
 import parameters_run
 
 #self.SIZE=parameters_run.get_self.SIZE()
@@ -11,7 +11,7 @@ import parameters_run
 # probability = 0.99
 class Q_Learning:
 
-    def __init__(self, environment,learning_rate,discount_rate, **parameters):
+    def __init__(self, environment,learning_rate,discount_rate,probability, **parameters):
         self.SIZE=parameters_run.get_size()
         self.env = environment
 
@@ -31,8 +31,23 @@ class Q_Learning:
         self.q_table = np.zeros((len(environment.get_state_space()), len(environment.get_action_space())))
         self.all_episode_rewards = []
         self.useNusmv=parameters_run.get_useNusmv()
+
+        self.probability = probability
+        self.probs = np.zeros((len(environment.get_state_space()), len(environment.get_action_space())))
+
     def getQ(self):
         return self.q_table
+
+    def update_probs(self, probability, row):  # get the probability matrix according to the q_table
+        best_action = np.argmax(self.q_table[row, :])  # get the best action from the q_table
+        valid_actions = [action.value for action in self.env.valid_actions_of_state(row)]  # get the valid actions
+        if best_action in valid_actions:  # if the best action is valid
+            valid_actions.remove(best_action)  # remove the best action from the valid actions
+        self.probs[row, :] = 0  # reset the row
+        self.probs[row, best_action] = probability  # the best action gets our probability
+        # the other actions get the rest of the probability (1-p)/(num_actions-1)
+        self.probs[row, valid_actions] = (1 - probability) / (len(valid_actions))
+
     def setuseNusmv(self,value):
          self.useNusmv=value
     def run_algorithm(self,probability,index):
@@ -55,14 +70,15 @@ class Q_Learning:
                 else:
                     action_index = np.argmax(self.q_table[state, :])
 
-                # new_state, reward, done = self.env.step(action_index)
-                new_state, reward, done = self.env.stocastic_step(action_index,probability)
-                
+                new_state, reward, done = self.env.step(action_index)
+                # new_state, reward, done = self.env.stocastic_step(action_index, probability)
 
+                # update the q_table and prob matrix accordingly
                 self.q_table[state][action_index] = self.q_table[state][action_index] * (1 - self.learning_rate) + \
-                                                    self.learning_rate * (
-                                                            reward + self.discount_rate * np.max(
-                                                        self.q_table[new_state, :]))
+                                                    self.learning_rate * \
+                                                    (reward + self.discount_rate * np.max(self.q_table[new_state, :]))
+
+                self.update_probs(probability, state)
 
                 state = new_state
                 rewards_for_current_episode += reward              
@@ -82,6 +98,7 @@ class Q_Learning:
 
             if (episode%100==0) and episode>0 and self.useNusmv==1:
                 writeSmv(self.SIZE, maxSteps ,self.q_table, self.env.get_holes(),index= index)
+                writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
                 answer=runSmv(index)
                 
                 if answer[1]==False:
@@ -118,10 +135,10 @@ class Q_Learning:
                                                             self.learning_rate * (
                                                                     reward + self.discount_rate * np.max(
                                                                 self.q_table[int(new_state), :]))+10*self.SIZE*self.SIZE
-            
+
 
                 #lose
-                
+
                 if FLAG_win==True and answer[2]==0 and answer[3]==0:
                     #print("dead")
                     print(finalanswer)
@@ -131,15 +148,15 @@ class Q_Learning:
                     maxSteps=len(answer[0])-1
                     FLAG_win=True
                     finalanswer=answer[0]
-                
-        
+
+
             #print(answer)
             #find convergence
             self.bigChange= np.ndarray.max(np.abs(np.subtract(old_q,self.q_table)))
             self.episodes=self.episodes+1
             if self.bigChange<=self.epsilon :
                 break
-    
+
     def print_results(self,index):
         print('big Change')
         print('{:010.10f}'.format(self.bigChange))
@@ -147,7 +164,7 @@ class Q_Learning:
         print(self.episodes)
         writeSmv(self.SIZE, 10000 ,self.q_table, self.env.get_holes(),index= index)
         answer=runSmv(index)
-                
+
         if answer[1]==True:
          print("found something ", len(answer[0]))
          print(answer[0])

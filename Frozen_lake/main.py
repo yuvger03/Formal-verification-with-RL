@@ -42,7 +42,7 @@ def main(p, learning_rate, index, discount_factor):
             parameters_run.set_size(size2)
         for i in range(num_games):
             frozen_lake_environment = Environment()
-            q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, discount_factor)
+            q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, discount_factor, p)
             if i < switch:
                 q_learning_algo.setuseNusmv(1)
             if i >= switch:

@@ -8,6 +8,8 @@ import parameters_run
 import environment
 import math
 
+
+# SMV
 def writeStart(filename):
     SIZE=parameters_run.get_size()
     if os.path.exists(filename):
@@ -33,7 +35,7 @@ def writeStart(filename):
 
         fw.write("			\n\n	init(currentPosition) := 0;")
 
-        #this is the counter 
+        #this is the counter
         fw.write("			\n\n	init(countSteps) := 0;\n\n")
 
         fw.write("    next(currentPosition) := case\n")
@@ -72,15 +74,36 @@ def bestActions(q_line,user_po):
     if(len(bestactionlist)==0):
     """
     if legalActions(0,user_po):
-     bestactionlist.append(user_po-1)
+        bestactionlist.append(user_po-1)
     if legalActions(1,user_po):
-     bestactionlist.append(user_po+1)
+        bestactionlist.append(user_po+1)
     if legalActions(2,user_po):
-     bestactionlist.append(user_po-SIZE)
+        bestactionlist.append(user_po-SIZE)
     if legalActions(3,user_po):
-     bestactionlist.append(user_po+SIZE)
+        bestactionlist.append(user_po+SIZE)
 
     return bestactionlist
+
+
+def validActions(user_po):
+    size = parameters_run.get_size()
+    valid = []
+    pos = [0 for i in range(4)]
+    if legalActions(0, user_po):
+        pos[0] = user_po - 1
+        valid.append(0)
+    if legalActions(1, user_po):
+        pos[1] = user_po + 1
+        valid.append(1)
+    if legalActions(2, user_po):
+        pos[2] = user_po - size
+        valid.append(2)
+    if legalActions(3, user_po):
+        pos[3] = user_po + size
+        valid.append(3)
+
+    return valid, pos
+
 
 
 def legalActions(index,user_po):
@@ -89,7 +112,7 @@ def legalActions(index,user_po):
     #   can't go up once you are at top of board
     #   can't go down once you are at bottom of board
     #   can't go left or right once you are at edge of board
-    
+
         #left
     if index==0 and user_po%SIZE!=(0):
         return True
@@ -108,7 +131,7 @@ def writePlayer(filename, listOfHoles, currentOptimal, Q):
     SIZE=parameters_run.get_size()
     if os.path.exists(filename):
         os.remove(filename)
-    
+
     #write rest of smv file
     with open(filename, 'w') as fw:
         for i in range(len(listOfHoles)):
@@ -119,10 +142,10 @@ def writePlayer(filename, listOfHoles, currentOptimal, Q):
                 bestMove=bestActions(Q[i],i)
                 fw.write(f"               currentPosition = "+ str(i) + ": " + "{")
                 lw = ""
-                
+
                 for i in range(len(bestMove)):
                     lw = lw + str(bestMove[i]) + ','
-                
+
                 #lw = lw + str(bestMove[0]) + ','
                 lw = lw[:-1]
                 lw = lw + "};\n"
@@ -169,7 +192,7 @@ def runSmv(index):
     ans = str(output[26][47:])[2:]
     ans = ans[0:len(ans) - 1]
     moveList=list()
-   
+
     if 'false' in str(output):
         loop_vecs = str(b''.join(output))
         chunks = loop_vecs.split(' ')
@@ -203,7 +226,7 @@ def runSmv(index):
                step=3
                return moveList, TorF,int(moveList[i-1]),step
          else:
-            setOfMoves.add(moveList[i]) 
+            setOfMoves.add(moveList[i])
         if int(moveList[len(moveList)-1])==SIZE*SIZE-1:
           return moveList, True,0,0
         else:
@@ -216,3 +239,81 @@ def runSmv(index):
             if int(moveList[len(moveList)-2])-int(moveList[len(moveList)-1])==-SIZE:
              return moveList, moveList, int(moveList[len(moveList)-2]),3
     return moveList,False,0,0
+
+
+# PRISM
+def writeStartPrism(filename):
+    size = parameters_run.get_size()
+    if os.path.exists(filename):
+        os.remove(filename)  # create new file
+
+    # write beginning of prism file
+    with open(filename, 'w') as fw:
+        fw.write("dtmc\n\n")
+        fw.write("module main\n\n")
+        fw.write("currentPosition : [0.." + str(size * size - 1) + "] init 0;\n")
+        fw.write("countSteps : [0.." + str(size * size) + "] init 0;\n\n")
+
+
+def writePlayerPrism(filename, list_of_holes, q_table, probs):
+    size = parameters_run.get_size()
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    with open(filename, 'w') as fw:
+        # next state value
+        for i in range(len(list_of_holes)):  # if we're in a hole, we can't move
+            fw.write("\t[] currentPosition=" + str(list_of_holes[i]) + " -> ")
+            fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
+        # got to the end of the grid
+        fw.write("\t[] currentPosition=" + str(size * size - 1) + " -> ")
+        fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
+
+        # rest of the states
+        for i in range(size * size - 1):
+            if i not in list_of_holes:  # not a hole
+                valid, pos = validActions(i)  # get the valid actions and the next positions
+                # create the string to write to the file
+                str_to_write = "\t[] currentPosition=" + str(i) + " -> "
+                if sum([probs[i][action] for action in valid]) == 0:  # all is zero - we didn't visit this state
+                    for action in valid:
+                        str_to_write += (str(float(1)/len(valid)) + " : (currentPosition'=" + str(pos[action]) + ") + ")
+                else:
+                    for action in valid:
+                        str_to_write += (str(probs[i][action]) + " : (currentPosition'=" + str(pos[action]) + ") + ")
+                str_to_write = str_to_write[:-3] + ";\n"
+                fw.write(str_to_write)
+
+        # next countSteps value
+        # we didn't reach the end of the grid, and we have steps left
+        str_to_write = "\n\t[] (countSteps!=" + str(size * size) + ")&(currentPosition!=" + str(size * size - 1) \
+                       + ") -> (countSteps'=(countSteps + 1));\n"
+        # else - we reached the end of the grid, or we don't have steps left
+        str_to_write += ("\t[] (countSteps=" + str(size * size) + ")|(currentPosition=" + str(size * size - 1)
+                         + ") -> (countSteps'=countSteps);\n\n")
+        fw.write(str_to_write)
+
+        fw.write("endmodule\n\n")
+
+
+def writePrism(size, currentOptimal, q_table, listOfHoles, index, probs):
+    size = parameters_run.get_size()
+    filename_main = f'tests/test_t1_{index}.prism'
+    if os.path.exists(filename_main):
+        os.remove(filename_main)
+    with open(filename_main, 'w') as fw:
+        filename_start = f'tests/prism_add_start_{1}{size}{index}.txt'
+        writeStartPrism(filename_start)
+        with open(filename_start, 'r') as fr:
+            for line in fr:
+                fw.write(line)
+
+        filename_player = f'tests/prism_{1}playersnextC{size}{index}.txt'
+        writePlayerPrism(filename_player, listOfHoles, q_table, probs)
+        with open(filename_player, 'r') as fr:
+            for line in fr:
+                fw.write(line)
+
+    props_file = f'tests/test_t1_{index}.props'
+    with open(props_file, 'w') as fw:
+        fw.write("P=? [!(F ((currentPosition ="+str(size*size-1)+")&(countSteps<"+str(currentOptimal-1)+")))]\n")

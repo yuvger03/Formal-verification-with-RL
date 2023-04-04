@@ -103,6 +103,23 @@ class Environment:
         else:
             return self.current_state, -10 * self.SIZE * self.SIZE, True
 
+    def valid_actions_of_state(self, state):
+        valid_actions = []
+        for action in self.action_space:
+            if not self.invalid_action_of_state(action, state):
+                valid_actions.append(action)
+        return valid_actions
+
+    def invalid_action_of_state(self, action, state):
+        if (action == Action.Left and state % self.SIZE == 0) or \
+                (action == Action.Right and state % (self.SIZE) == (self.SIZE - 1)) or \
+                (action == Action.Up and state < self.SIZE) or \
+                (action == Action.Down and (
+                        self.SIZE * self.SIZE - self.SIZE) <= state <= self.SIZE * self.SIZE - 1):
+            return True
+
+        return False
+
     def valid_actions(self):
         valid_actions = []
         for action in self.action_space:
