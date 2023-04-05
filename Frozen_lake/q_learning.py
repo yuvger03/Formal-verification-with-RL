@@ -3,7 +3,7 @@
 import numpy as np
 import random
 import time
-from utils import runSmv, writeSmv, writePrism
+from utils import runSmv, writeSmv, writePrism, runPrism
 import parameters_run
 
 #self.SIZE=parameters_run.get_self.SIZE()
@@ -98,7 +98,6 @@ class Q_Learning:
 
             if (episode%100==0) and episode>0 and self.useNusmv==1:
                 writeSmv(self.SIZE, maxSteps ,self.q_table, self.env.get_holes(),index= index)
-                writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
                 answer=runSmv(index)
                 
                 if answer[1]==False:
@@ -136,7 +135,9 @@ class Q_Learning:
                                                                     reward + self.discount_rate * np.max(
                                                                 self.q_table[int(new_state), :]))+10*self.SIZE*self.SIZE
 
-
+                        self.update_probs(probability, state)
+                        writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
+                        runPrism(index)
                 #lose
 
                 if FLAG_win==True and answer[2]==0 and answer[3]==0:

@@ -27,7 +27,7 @@ def main(p, learning_rate, index, discount_factor):
     DictResults["Did not converged ,with NuXmv"] = 0
     DictResults["Converged ,without NuXmv"] = 0
     DictResults["Did not converged,without NuXmv"] = 0
-    num_games = 50
+    num_games = 3
     switch = int(num_games)  # switch between with and without nuxmv
 
     results = open("./results.csv", 'a')
@@ -48,7 +48,7 @@ def main(p, learning_rate, index, discount_factor):
             if i >= switch:
                 q_learning_algo.setuseNusmv(0)
 
-            q_learning_algo.run_algorithm(p, index)
+            q_learning_algo.run_algorithm(p,index)
 
             Q = q_learning_algo.getQ()
             H = frozen_lake_environment.get_holes()
