@@ -135,7 +135,7 @@ class Q_Learning:
                                                                     reward + self.discount_rate * np.max(
                                                                 self.q_table[int(new_state), :]))+10*self.SIZE*self.SIZE
 
-                        self.update_probs(probability, state)
+                        self.update_probs(probability, int(n_state))
                         writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
                         runPrism(index)
                 #lose

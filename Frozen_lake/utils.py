@@ -198,6 +198,7 @@ def runSmv(index):
     ans = str(output[26][47:])[2:]
     ans = ans[0:len(ans) - 1]
     moveList = list()
+    print(output)
 
     if 'false' in str(output):
         loop_vecs = str(b''.join(output))
