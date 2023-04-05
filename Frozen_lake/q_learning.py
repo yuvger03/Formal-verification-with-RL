@@ -39,10 +39,9 @@ class Q_Learning:
         return self.q_table
 
     def update_probs(self, probability, row):  # get the probability matrix according to the q_table
-        best_action = np.argmax(self.q_table[row, :])  # get the best action from the q_table
         valid_actions = [action.value for action in self.env.valid_actions_of_state(row)]  # get the valid actions
-        if best_action in valid_actions:  # if the best action is valid
-            valid_actions.remove(best_action)  # remove the best action from the valid actions
+        best_action = valid_actions[np.argmax(self.q_table[row, valid_actions])]  # get best valid action from q_table
+        valid_actions.remove(best_action)  # remove the best action from the valid actions
         self.probs[row, :] = 0  # reset the row
         self.probs[row, best_action] = probability  # the best action gets our probability
         # the other actions get the rest of the probability (1-p)/(num_actions-1)
@@ -57,6 +56,7 @@ class Q_Learning:
         maxSteps=self.SIZE*self.SIZE+1
 
         finalanswer=[]
+        run_prism_index = 0
 
         for episode in range(self.num_episodes):
             rewards_for_current_episode = 0
@@ -96,12 +96,13 @@ class Q_Learning:
                 print("we are in episode", episode)
 
 
-            if (episode%100==0) and episode>0 and self.useNusmv==1:
+            if episode%100==0 and episode>0 and self.useNusmv==1:
                 writeSmv(self.SIZE, maxSteps ,self.q_table, self.env.get_holes(),index= index)
                 answer=runSmv(index)
                 
                 if answer[1]==False:
                     self.q_table[answer[2]][answer[3]]= self.q_table[answer[2]][answer[3]]-1000
+                    self.update_probs(probability, answer[2])
                     print(answer[0])
                     print(answer[1])
                     print(answer[2])
@@ -137,7 +138,7 @@ class Q_Learning:
 
                         self.update_probs(probability, int(n_state))
                         writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
-                        runPrism(index)
+                        runPrism(index, f'tests/nuxmv_prism_results_{index}.csv')
                 #lose
 
                 if FLAG_win==True and answer[2]==0 and answer[3]==0:
@@ -150,12 +151,16 @@ class Q_Learning:
                     FLAG_win=True
                     finalanswer=answer[0]
 
+            if episode % 100 == 0 and episode > 0 and self.useNusmv==0:  # not using nusmv - just run prism
+                writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
+                runPrism(index, f'tests/no_nuxmv_prism_results_{index}.csv')
+
 
             #print(answer)
             #find convergence
-            self.bigChange= np.ndarray.max(np.abs(np.subtract(old_q,self.q_table)))
-            self.episodes=self.episodes+1
-            if self.bigChange<=self.epsilon :
+            self.bigChange = np.ndarray.max(np.abs(np.subtract(old_q, self.q_table)))
+            self.episodes = self.episodes + 1
+            if self.bigChange <= self.epsilon:
                 break
 
     def print_results(self,index):

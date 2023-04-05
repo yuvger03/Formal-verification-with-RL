@@ -13,7 +13,7 @@ import parameters_run
 # need to change size only on envioremnt, and utils (if used)
 
 def main(p, learning_rate, index, discount_factor):
-    # currently you can check 2 sizes an build graph for both together
+    # currently you can check 2 sizes and build graph for both together
     size1 = 10
     size2 = 20
     with_nuxmv = []
@@ -27,8 +27,8 @@ def main(p, learning_rate, index, discount_factor):
     DictResults["Did not converged ,with NuXmv"] = 0
     DictResults["Converged ,without NuXmv"] = 0
     DictResults["Did not converged,without NuXmv"] = 0
-    num_games = 3
-    switch = int(num_games)  # switch between with and without nuxmv
+    num_games = 4
+    switch = int(num_games // 2)  # switch between with and without nuxmv
 
     results = open("./results.csv", 'a')
     writer = csv.writer(results)
@@ -37,18 +37,25 @@ def main(p, learning_rate, index, discount_factor):
     for s in range(2):
         if s == 0:
             parameters_run.set_size(size1)
-
         if s == 1:
             parameters_run.set_size(size2)
+
         for i in range(num_games):
             frozen_lake_environment = Environment()
             q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, discount_factor, p)
             if i < switch:
                 q_learning_algo.setuseNusmv(1)
-            if i >= switch:
+                file_name = f'tests/nuxmv_prism_results_{index}.csv'
+            else:  # i >= switch
                 q_learning_algo.setuseNusmv(0)
+                file_name = f'tests/no_nuxmv_prism_results_{index}.csv'
 
-            q_learning_algo.run_algorithm(p,index)
+            prism_results = open(file_name, 'a', newline='')
+            writer_prism = csv.writer(prism_results)
+            writer_prism.writerow([f"size = {parameters_run.get_size()} & num_games = {i}"])
+            prism_results.close()
+
+            q_learning_algo.run_algorithm(p, index)
 
             Q = q_learning_algo.getQ()
             H = frozen_lake_environment.get_holes()

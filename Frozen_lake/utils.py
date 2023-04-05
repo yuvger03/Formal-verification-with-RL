@@ -283,7 +283,7 @@ def writePlayerPrism(filename, list_of_holes, q_table, probs):
                 # create the string to write to the file
                 str_to_write = "\t[] currentPosition=" + str(i) + " -> "
                 if sum([probs[i][action] for action in valid]) == 0:  # all is zero - we didn't visit this state
-                    for action in valid:
+                     for action in valid:
                         str_to_write += (
                                 str(float(1) / len(valid)) + " : (currentPosition'=" + str(pos[action]) + ") + ")
                 else:
@@ -327,19 +327,20 @@ def writePrism(size, currentOptimal, q_table, listOfHoles, index, probs):
         fw.write("P=? [!(F ((currentPosition =" + str(size * size - 1) + ")&(countSteps<" + str(
             currentOptimal - 1) + ")))]\n")
 
-def runPrism(index):
+
+def runPrism(index, results_file):
     size = parameters_run.get_size()
     filename = f'tests/test_t1_{index}.prism'
     props_file = f'tests/test_t1_{index}.props'
     result_file = f'tests/test_t1_{index}.res'
     if os.path.exists(result_file):
         os.remove(result_file)
-    os.system(f'prism {filename} {props_file} -exportresults {result_file} -const SIZE={size}')
-    csv_file = f'tests/test_t1_{index}.csv'
-    csv_file = open(csv_file, 'a')
+    os.system(f'prism {filename} {props_file} -exportresults {result_file}')
 
+    # save results to csv file
+    csv_file = open(results_file, 'a', newline='')
     writer = csv.writer(csv_file)
-    writer.writerow([open(result_file, 'r').readlines()[1]])
+    writer.writerow([open(result_file, 'r').readlines()[1].strip('\n')])
     csv_file.close()
 
 
