@@ -17,7 +17,7 @@ Q_LEARNING = True
 #############
 Play_Random = True
 check_without_smv = 1
-probability = 0.8
+probability = 0.98
 
 class State:
     def __init__(self, init_vec=None, p1=None, p2=None, max_turns=50, exp_rate=0.1, start_q=0, flg=True):

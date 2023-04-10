@@ -13,8 +13,8 @@ def main():
     DictResults["Did not converged ,with NuXmv"]=0
     DictResults["Converged ,without NuXmv"]=0
     DictResults["Did not converged,without NuXmv"]=0
-    num_games=20
-    switch=int(num_games/2)
+    num_games=4
+    switch=int(0)
     for i in range(num_games):
         get_the_cheese = Environment()
         q_learning_algo = Q_Learning(get_the_cheese)

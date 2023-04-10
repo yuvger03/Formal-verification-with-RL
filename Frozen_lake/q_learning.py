@@ -52,7 +52,7 @@ class Q_Learning:
     def run_algorithm(self,probability,index):
         #FLAG_win shows wheter smv found a solution or not and what solution
         FLAG_win=False
-        #maxSteps shows which number of steps we need to take to win 
+        #maxSteps shows which number of steps we need to take to win
         maxSteps=self.SIZE*self.SIZE+1
 
         finalanswer=[]
@@ -99,16 +99,16 @@ class Q_Learning:
             if episode%100==0 and episode>0 and self.useNusmv==1:
                 writeSmv(self.SIZE, maxSteps ,self.q_table, self.env.get_holes(),index= index)
                 answer=runSmv(index)
-                
-                if answer[1]==False:
+
+                if not answer[1]:
                     self.q_table[answer[2]][answer[3]]= self.q_table[answer[2]][answer[3]]-1000
                     self.update_probs(probability, answer[2])
                     print(answer[0])
                     print(answer[1])
                     print(answer[2])
                     print(answer[3])
-                    
-                if answer[1]==True:
+
+                if answer[1]:
                     print("found something ", len(answer[0]))
                     FLAG_win=True
                     maxSteps=len(answer[0])
@@ -117,7 +117,7 @@ class Q_Learning:
                     for i in range(len(answer[0])-1):
                         n_state=answer[0][i]
                         new_state=answer[0][i+1]
-                        
+
                         #left
                         if int(new_state)-int(n_state)==int(-1):
                             action_index=0
@@ -141,12 +141,12 @@ class Q_Learning:
                         runPrism(index, f'tests/nuxmv_prism_results_{index}.csv')
                 #lose
 
-                if FLAG_win==True and answer[2]==0 and answer[3]==0:
+                if FLAG_win and answer[2]==0 and answer[3]==0:
                     #print("dead")
                     print(finalanswer)
                     print("length of answer ", len(finalanswer))
                     #break
-                if answer[1]==True:
+                if answer[1]:
                     maxSteps=len(answer[0])-1
                     FLAG_win=True
                     finalanswer=answer[0]
@@ -171,7 +171,7 @@ class Q_Learning:
         writeSmv(self.SIZE, 10000 ,self.q_table, self.env.get_holes(),index= index)
         answer=runSmv(index)
 
-        if answer[1]==True:
+        if answer[1]:
          print("found something ", len(answer[0]))
          print(answer[0])
 
