@@ -13,7 +13,7 @@ def main():
     DictResults["Did not converged ,with NuXmv"]=0
     DictResults["Converged ,without NuXmv"]=0
     DictResults["Did not converged,without NuXmv"]=0
-    num_games=4
+    num_games=2
     switch=int(0)
     for i in range(num_games):
         get_the_cheese = Environment()
@@ -39,9 +39,8 @@ def main():
            DictResults["Converged ,without NuXmv"]+=1
         if r==1 and i<switch: #to change
            DictResults["Converged ,with NuXmv"]+=1
-        
+        print(q_learning_algo.q_table)
     width = 0.1 
-    
     plt.bar(DictResults.keys(), DictResults.values(),width)
     plt.ylabel('Games') 
   
