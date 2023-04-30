@@ -1,7 +1,7 @@
 size = 10
 useNusmv = 1
 num_steps_in_episode = 7
-start_point = 2
+start_point = 5
 score = 5
 
 
