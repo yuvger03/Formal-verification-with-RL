@@ -86,7 +86,7 @@ def writePlayer(filename, listOfHoles, currentOptimal, Q):
         for i in range(len(listOfHoles)):
             fw.write(f"               currentPosition = "+ str(listOfHoles[i])+ ": " + "{" + str(listOfHoles[i]) + "};\n")
         fw.write(f"               currentPosition = "+ str(SIZE-1)+"&score<9"+ ": " + "{" + str(SIZE-2) + "};\n")
-        fw.write(f"               currentPosition = "+ str(SIZE-1)+ "&score>=10: " + "{" + str(SIZE-1) + "};\n")
+        fw.write(f"               currentPosition = "+ str(SIZE-1)+ "&score>=9: " + "{" + str(SIZE-1) + "};\n")
         for i in range(SIZE-1):
             if i not in listOfHoles:
                 bestMove=bestActions(Q[i],i)
