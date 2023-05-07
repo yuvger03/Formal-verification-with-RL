@@ -1,16 +1,14 @@
 import numpy as np
 import random
-import time
 from utils import runSmv, writeSmv, writePrism, runPrism
 import parameters_run
 
 SIZE = parameters_run.get_size()
-probability = 1
 
 
 class Q_Learning:
 
-    def __init__(self, environment, **parameters):
+    def __init__(self, environment, probability=1.0, **parameters):
         self.env = environment
 
         self.num_episodes = parameters.get('num_episodes', SIZE * 1000)
@@ -47,7 +45,7 @@ class Q_Learning:
     def setuseNusmv(self, value):
         self.useNusmv = value
 
-    def run_algorithm(self,index =1):
+    def run_algorithm(self, index=1):
         # FLAG_win shows wheter smv found a solution or not and what solution
         FLAG_win = False
         # maxSteps shows which number of steps we need to take to win 
@@ -68,7 +66,7 @@ class Q_Learning:
                     action_index = np.argmax(self.q_table[state, :])
 
                 # new_state, reward, done = self.env.step(action_index)
-                new_state, reward, done = self.env.stocastic_step(action_index, probability)
+                new_state, reward, done = self.env.stocastic_step(action_index, self.probability)
 
                 self.q_table[state][action_index] = self.q_table[state][action_index] * (1 - self.learning_rate) + \
                                                     self.learning_rate * (
@@ -119,8 +117,9 @@ class Q_Learning:
                                                                        self.q_table[int(new_state),
                                                                        :])) + 10000000 * SIZE * SIZE
                         self.update_probs(self.probability, int(n_state))
-                        writePrism(SIZE, maxSteps, self.q_table, self.env.get_holes(), index, probs=self.probs)
-                        runPrism(index,f'tests/nuxmv_prism_results_{index}.csv')
+                        writePrism(SIZE, maxSteps, self.q_table, self.env.get_holes(), index, p=self.probability,
+                                   probs=self.probs,useNuxmv = self.useNusmv)
+                        runPrism(index, f'tests/nuxmv_prism_results_{parameters_run.get_size()}{self.probability}.csv')
                 # lose
 
                 if FLAG_win and answer[2] == 0 and answer[3] == 0:
@@ -133,9 +132,10 @@ class Q_Learning:
                     FLAG_win = True
                     finalAnswer = answer[0]
 
-            if episode % 100 == 0 and episode > 0 and self.useNusmv==0:  # not using nusmv - just run prism
-                writePrism(SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
-                runPrism(index, f'tests/no_nuxmv_prism_results_{index}.csv')
+            if episode % 100 == 0 and episode > 0 and self.useNusmv == 0:  # not using nusmv - just run prism
+                writePrism(SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, p=self.probability,
+                           probs=self.probs,useNuxmv = self.useNusmv)
+                runPrism(index, f'tests/no_nuxmv_prism_results_{parameters_run.get_size()}{self.probability}.csv')
             # print(answer)
             # find convergence
             self.bigChange = np.ndarray.max(np.abs(np.subtract(old_q, self.q_table)))
@@ -172,7 +172,7 @@ class Q_Learning:
             # self.env.print_current_state()
 
             action_index = np.argmax(self.q_table[state, :])
-            new_state, _, done = self.env.stocastic_step(action_index, probability)
+            new_state, _, done = self.env.stocastic_step(action_index, self.probability)
             # new_state, _, done = self.env.step(action_index)
             state = new_state
 
