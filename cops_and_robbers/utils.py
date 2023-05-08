@@ -411,7 +411,10 @@ def writeSmv(numOfPlayers, max_digit, p1, all_vecs, l_vecs):
 def runSmv():
     smv_file = f'test_t3.smv'
     os.chdir('tests')
-    output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines()
+    if os.name is 'nt':
+        output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines()  # on windows
+    else:
+        output = subprocess.check_output('nuXmv ' + smv_file, shell=True).splitlines()  # on linux
     os.chdir('../')
     ans = str(output[26][47:])[2:]
     ans = ans[0:len(ans) - 1]

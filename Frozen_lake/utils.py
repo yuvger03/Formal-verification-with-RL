@@ -193,7 +193,10 @@ def runSmv(index):
     SIZE = parameters_run.get_size()
     smv_file = f'test_t1_{index}.smv'
     os.chdir('tests')
-    output = subprocess.check_output([f'nuXmv', smv_file], shell=True).splitlines() #on windows
+    if os.name is 'nt':
+        output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines() #on windows
+    else:
+        output = subprocess.check_output('nuXmv '+ smv_file, shell=True).splitlines() #on linux
     os.chdir('../')
     ans = str(output[26][47:])[2:]
     ans = ans[0:len(ans) - 1]

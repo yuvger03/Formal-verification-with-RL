@@ -140,7 +140,10 @@ def writeSmv(SIZE, currentOptimal, Q, listOfHoles, index):
 def runSmv():
     smv_file = f'test_t1.smv'
     os.chdir('tests')
-    output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines()
+    if os.name is 'nt':
+        output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines()  # on windows
+    else:
+        output = subprocess.check_output('nuXmv ' + smv_file, shell=True).splitlines()  # on linux
     os.chdir('../')
     ans = str(output[26][47:])[2:]
     ans = ans[0:len(ans) - 1]
