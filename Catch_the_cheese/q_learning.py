@@ -8,9 +8,9 @@ SIZE = parameters_run.get_size()
 
 class Q_Learning:
 
-    def __init__(self, environment, probability=1.0, **parameters):
+    def __init__(self, environment, probability=1.0,index = 1, **parameters):
         self.env = environment
-
+        self.index = index
         self.num_episodes = parameters.get('num_episodes', SIZE * 1000)
         self.max_steps_per_episode = parameters.get('max_steps_per_episode', parameters_run.get_num_steps_in_episode())
         self.learning_rate = parameters.get('learning_rate', 0.1)
@@ -91,7 +91,7 @@ class Q_Learning:
 
             if (episode % 2000 == 0) and episode > 0 and self.useNusmv == 1:
                 writeSmv(SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index)
-                answer = runSmv()
+                answer = runSmv(index=index)
 
                 if answer[1]:
                     print("found something ", len(answer[0]))
@@ -148,8 +148,8 @@ class Q_Learning:
         print('{:010.10f}'.format(self.bigChange))
         print('Episodes')
         print(self.episodes)
-        writeSmv(SIZE, 10000, self.q_table, self.env.get_holes())
-        answer = runSmv()
+        writeSmv(SIZE, 10000, self.q_table, self.env.get_holes(), index=self.index)
+        answer = runSmv(self.index)
 
         if answer[1] == True:
             print("found something ", len(answer[0]))

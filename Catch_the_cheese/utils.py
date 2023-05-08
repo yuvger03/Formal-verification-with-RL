@@ -137,10 +137,10 @@ def writeSmv(SIZE, currentOptimal, Q, listOfHoles, index):
 
 
 # run smv file and check the result
-def runSmv():
-    smv_file = f'test_t1.smv'
+def runSmv(index):
+    smv_file = f"test_t1_{index}.smv"
     os.chdir('tests')
-    if os.name is 'nt':
+    if os.name == 'nt':
         output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines()  # on windows
     else:
         output = subprocess.check_output('nuXmv ' + smv_file, shell=True).splitlines()  # on linux
