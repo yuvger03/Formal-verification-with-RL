@@ -3,16 +3,15 @@ import random
 from utils import runSmv, writeSmv, writePrism, runPrism
 import parameters_run
 
-SIZE = parameters_run.get_size()
-
 
 class Q_Learning:
 
-    def __init__(self, environment, probability=1.0,index = 1, **parameters):
+    def __init__(self, environment, probability=1.0, index=1, PR=None, **parameters):
+        self.PR = PR
         self.env = environment
         self.index = index
-        self.num_episodes = parameters.get('num_episodes', SIZE * 1000)
-        self.max_steps_per_episode = parameters.get('max_steps_per_episode', parameters_run.get_num_steps_in_episode())
+        self.num_episodes = parameters.get('num_episodes', PR.size * 1000)
+        self.max_steps_per_episode = parameters.get('max_steps_per_episode', PR.num_steps_in_episode)
         self.learning_rate = parameters.get('learning_rate', 0.1)
         self.discount_rate = parameters.get('discount_rate', 0.99)
         self.exploration_rate = parameters.get('exploration_rate', 1)
@@ -26,7 +25,7 @@ class Q_Learning:
 
         self.q_table = np.zeros((len(environment.get_state_space()), len(environment.get_action_space())))
         self.all_episode_rewards = []
-        self.useNusmv = parameters_run.get_useNusmv()
+        self.useNusmv = PR.get_useNusmv()
         self.probability = probability
         self.probs = np.zeros((len(environment.get_state_space()), len(environment.get_action_space())))
 
@@ -49,7 +48,7 @@ class Q_Learning:
         # FLAG_win shows wheter smv found a solution or not and what solution
         FLAG_win = False
         # maxSteps shows which number of steps we need to take to win 
-        maxSteps = SIZE * SIZE + 1
+        maxSteps = self.PR.size * self.PR.size + 1
 
         finalAnswer = []
 
@@ -90,8 +89,8 @@ class Q_Learning:
                 print("we are in episode", episode)
 
             if (episode % 2000 == 0) and episode > 0 and self.useNusmv == 1:
-                writeSmv(SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index)
-                answer = runSmv(index=index)
+                writeSmv(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index=index, PR=self.PR)
+                answer = runSmv(index=index, PR=self.PR)
 
                 if answer[1]:
                     print("found something ", len(answer[0]))
@@ -115,11 +114,12 @@ class Q_Learning:
                                                                    self.learning_rate * (
                                                                            reward + self.discount_rate * np.max(
                                                                        self.q_table[int(new_state),
-                                                                       :])) + 10000000 * SIZE * SIZE
+                                                                       :])) + 10000000 * self.PR.size * self.PR.size
                         self.update_probs(self.probability, int(n_state))
-                        writePrism(SIZE, maxSteps, self.q_table, self.env.get_holes(), index, p=self.probability,
-                                   probs=self.probs,useNuxmv = self.useNusmv)
-                        runPrism(index, f'tests/nuxmv_prism_results_{parameters_run.get_size()}{self.probability}.csv')
+                        writePrism(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index,
+                                   p=self.probability,
+                                   probs=self.probs, useNuxmv=self.useNusmv, PR=self.PR)
+                        runPrism(index, f'tests/nuxmv_prism_results_{self.PR.size}{self.probability}.csv', PR=self.PR)
                 # lose
 
                 if FLAG_win and answer[2] == 0 and answer[3] == 0:
@@ -133,9 +133,9 @@ class Q_Learning:
                     finalAnswer = answer[0]
 
             if episode % 100 == 0 and episode > 0 and self.useNusmv == 0:  # not using nusmv - just run prism
-                writePrism(SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, p=self.probability,
-                           probs=self.probs,useNuxmv = self.useNusmv)
-                runPrism(index, f'tests/no_nuxmv_prism_results_{parameters_run.get_size()}{self.probability}.csv')
+                writePrism(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index=index, p=self.probability,
+                           probs=self.probs, useNuxmv=self.useNusmv, PR=self.PR)
+                runPrism(index, f'tests/no_nuxmv_prism_results_{self.PR.get_size()}{self.probability}.csv', PR=self.PR)
             # print(answer)
             # find convergence
             self.bigChange = np.ndarray.max(np.abs(np.subtract(old_q, self.q_table)))
@@ -148,8 +148,8 @@ class Q_Learning:
         print('{:010.10f}'.format(self.bigChange))
         print('Episodes')
         print(self.episodes)
-        writeSmv(SIZE, 10000, self.q_table, self.env.get_holes(), index=self.index)
-        answer = runSmv(self.index)
+        writeSmv(self.PR.size, 10000, self.q_table, self.env.get_holes(), index=self.index, PR=self.PR)
+        answer = runSmv(self.index, self.PR)
 
         if answer[1] == True:
             print("found something ", len(answer[0]))

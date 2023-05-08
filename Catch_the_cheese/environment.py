@@ -1,22 +1,23 @@
-from numpy import random, size
+from numpy import random
 from action import Action
 import numpy as np
 from copy import deepcopy
 from numpy.random import seed
 from numpy.random import randint
 import random
-import parameters_run
+from parameters_run import ParametersRun
 
-SIZE = parameters_run.get_size()
+# self.PR.size = ParametersRun.get_PR.size()
 NUM_HOLES = 1
 
 
 class Environment:
 
-    def __init__(self):
+    def __init__(self, PR=None):
+        self.PR = PR
         # write the map
         self.map = ['H']
-        for i in range(1, SIZE - 1):
+        for i in range(1, self.PR.size - 1):
             self.map.append('F')
         self.map.append('C')
 
@@ -44,7 +45,7 @@ class Environment:
         action = Action(action_index)
 
         if self.invalid_action(action):
-            return self.current_state, -10 * SIZE * SIZE, False
+            return self.current_state, -10 * self.PR.size * self.PR.size, False
 
         if action == Action.Left:
             self.current_state -= 1
@@ -54,14 +55,14 @@ class Environment:
         letter = self.map[self.current_state]
 
         if letter == 'F':
-            return self.current_state, -SIZE, False
+            return self.current_state, -self.PR.size, False
         if letter == 'C' and self.score < 5:
             self.score += 1
-            return self.current_state, 100 * SIZE * SIZE, False
-        if letter == 'C' and self.score >= parameters_run.get_score():
-            return self.current_state, 10010 * SIZE * SIZE, True
+            return self.current_state, 100 * self.PR.size * self.PR.size, False
+        if letter == 'C' and self.score >= self.PR.get_score():
+            return self.current_state, 10010 * self.PR.size * self.PR.size, True
         else:
-            return self.current_state, -10 * SIZE * SIZE, True
+            return self.current_state, -10 * self.PR.size * self.PR.size, True
 
     def stocastic_step(self, action_index, probabiltyOfStep):
         step = self.probabiltyOfSteps(action_index, probabiltyOfStep)
@@ -78,7 +79,7 @@ class Environment:
         valid_actions = []
         if self.current_state != 0:
             valid_actions.append(Action.Left)
-        if self.current_state != (SIZE - 1):
+        if self.current_state != (self.PR.size - 1):
             valid_actions.append(Action.Right)
         return valid_actions
 
@@ -91,26 +92,26 @@ class Environment:
 
     def invalid_action_of_state(self, action, state):
         if (action == Action.Left and state == 0) or \
-                (action == Action.Right and state == (SIZE - 1)):
+                (action == Action.Right and state == (self.PR.size - 1)):
             return True
 
         return False
 
     def invalid_action(self, action):
         if (action == Action.Left and self.current_state == 0) or \
-                (action == Action.Right and self.current_state == (SIZE - 1)):
+                (action == Action.Right and self.current_state == (self.PR.size - 1)):
             return True
 
         return False
 
     def reset(self):
-        self.current_state = parameters_run.get_start_point()
+        self.current_state = self.PR.get_start_point()
         self.score = 0
         return self.current_state
 
     def print_current_state(self):
         temp_map = deepcopy(self.map)
-        for i in range(0, SIZE):
+        for i in range(0, self.PR.size):
             if self.current_state != i:
                 if (temp_map[i] == 'F'):
                     print('.', end=" ")
