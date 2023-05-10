@@ -3,10 +3,12 @@ import sys
 from parameters_run import ParametersRun
 from environment import Environment
 from q_learning import Q_Learning
+
+
 # import matplotlib.pyplot as plt
 
 
-def main(p,size,index):
+def main(p, size, index):
     parameters_run = ParametersRun()
     parameters_run.setNewParameters(size)
     # DictResults = {}
@@ -14,11 +16,11 @@ def main(p,size,index):
     # DictResults["Did not converged ,with NuXmv"] = 0
     # DictResults["Converged ,without NuXmv"] = 0
     # DictResults["Did not converged,without NuXmv"] = 0
-    num_games = 5
-    switch = num_games
+    num_games = 1
+    switch = 2
     for i in range(num_games):
         get_the_cheese = Environment(parameters_run)
-        q_learning_algo = Q_Learning(get_the_cheese,probability=p,index=index,PR = parameters_run)
+        q_learning_algo = Q_Learning(get_the_cheese, probability=p, index=index, PR=parameters_run)
         if i < switch:
             q_learning_algo.setuseNusmv(1)
         if i >= switch:
@@ -58,4 +60,4 @@ if __name__ == '__main__':
     # for size in [10,15,20]:
     #     for j in range(0,9):
     #         p = 1 - j * 0.05
-    main(float(sys.argv[1]),int(sys.argv[2]),int(sys.argv[3]))
+    main(float(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
