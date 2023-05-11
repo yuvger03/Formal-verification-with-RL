@@ -64,15 +64,17 @@ class Environment:
         else:
             return self.current_state, -10 * self.PR.size * self.PR.size, True
 
-    def stocastic_step(self, action_index, probabiltyOfStep):
-        step = self.probabiltyOfSteps(action_index, probabiltyOfStep)
+    def stochastic_step(self, action_index, probabilityOfStep):
+        step = self.probabilityOfSteps(action_index, probabilityOfStep)
         return self.step(step)
 
-    def probabiltyOfSteps(self, action_index, probabiltyOfStep):  # returns the probability of the actions
+    def probabilityOfSteps(self, action_index, probabilityOfStep):  # returns the probability of the actions
         action = Action(action_index)
         validActions = self.get_valid_actions()
-        if np.random.uniform(0, 1) < probabiltyOfStep or (len(validActions) == 1 and validActions[0] == action):
+        if np.random.uniform(0, 1) < probabilityOfStep or (len(validActions) == 1 and validActions[0] == action):
             return action
+        if action in validActions:
+            validActions.remove(action)
         return np.random.choice(validActions)
 
     def get_valid_actions(self):

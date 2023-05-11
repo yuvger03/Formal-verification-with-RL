@@ -127,15 +127,19 @@ class Environment:
                 valid_actions.append(action)
         return valid_actions
 
-    def probabiltyOfNextState(self, action, probabiltyOfStep):
+    def probabiltyOfNextState(self, action, probabilityOfStep):
         validActions = self.valid_actions()
-        if np.random.uniform(0, 1) < probabiltyOfStep or (len(validActions) == 1 and validActions[0] == action):
+        if np.random.uniform(0, 1) < probabilityOfStep or (len(validActions) == 1 and validActions[0] == action):
             return action
+        if action in validActions:
+            validActions.remove(action)
         return np.random.choice(validActions)
-    def stocastic_step(self, action_index, probabiltyOfStep):
+
+    def stochastic_step(self, action_index, probabilityOfStep):
         action = Action(action_index)
-        action = self.probabiltyOfNextState(action, probabiltyOfStep)
+        action = self.probabiltyOfNextState(action, probabilityOfStep)
         return self.step(action)
+
     def invalid_action(self, action):
         if (action == Action.Left and self.current_state % self.SIZE == 0) or \
                 (action == Action.Right and self.current_state % (self.SIZE) == (self.SIZE - 1)) or \

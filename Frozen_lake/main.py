@@ -45,10 +45,10 @@ def main(p, learning_rate, index, discount_factor):
             q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, discount_factor, p)
             if i < switch:
                 q_learning_algo.setuseNusmv(1)
-                file_name = f'tests/nuxmv_prism_results_{index}.csv'
+                file_name = f'tests/nuxmv_prism_results_{parameters_run.get_size()}{p}.csv'
             else:  # i >= switch
                 q_learning_algo.setuseNusmv(0)
-                file_name = f'tests/no_nuxmv_prism_results_{index}.csv'
+                file_name = f'tests/no_nuxmv_prism_results_{parameters_run.get_size()}{p}.csv'
 
             prism_results = open(file_name, 'a', newline='')
             writer_prism = csv.writer(prism_results)

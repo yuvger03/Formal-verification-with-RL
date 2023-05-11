@@ -70,8 +70,8 @@ class Q_Learning:
                 else:
                     action_index = np.argmax(self.q_table[state, :])
 
-                new_state, reward, done = self.env.step(action_index)
-                # new_state, reward, done = self.env.stocastic_step(action_index, probability)
+                # new_state, reward, done = self.env.step(action_index)
+                new_state, reward, done = self.env.stochastic_step(action_index, probability)
 
                 # update the q_table and prob matrix accordingly
                 self.q_table[state][action_index] = self.q_table[state][action_index] * (1 - self.learning_rate) + \
@@ -138,7 +138,7 @@ class Q_Learning:
 
                         self.update_probs(probability, int(n_state))
                         writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
-                        runPrism(index, f'tests/nuxmv_prism_results_{index}.csv')
+                        runPrism(index, f'tests/nuxmv_prism_results_{self.SIZE}{self.probability}.csv')
                 #lose
 
                 if FLAG_win and answer[2]==0 and answer[3]==0:
@@ -153,7 +153,7 @@ class Q_Learning:
 
             if episode % 100 == 0 and episode > 0 and self.useNusmv==0:  # not using nusmv - just run prism
                 writePrism(self.SIZE, maxSteps, self.q_table, self.env.get_holes(), index=index, probs=self.probs)
-                runPrism(index, f'tests/no_nuxmv_prism_results_{index}.csv')
+                runPrism(index, f'tests/no_nuxmv_prism_results_{self.SIZE}{self.probability}.csv')
 
 
             #print(answer)
@@ -195,7 +195,7 @@ class Q_Learning:
             #time.sleep(1)
             action_index = np.argmax(self.q_table[state, :])
             # new_state, _, done = self.env.step(action_index)
-            new_state, _, done = self.env.stocastic_step(action_index,probability)
+            new_state, _, done = self.env.stochastic_step(action_index, probability)
             state = new_state
 
             if done and state==self.SIZE*self.SIZE-1:
