@@ -5,6 +5,7 @@ class ParametersRun:
         self.num_steps_in_episode = 7
         self.start_point = 0
         self.score = 5
+        self.prob = 1
 
     def get_size(self):
         return self.size
@@ -43,3 +44,11 @@ class ParametersRun:
         factor = size / 10
         self.set_size(size)
         self.set_num_steps_in_episode(int(7 * factor))
+
+    def set_prob(self, value):
+        self.prob = value
+
+    def get_file_name(self):
+        if self.useNusmv:
+            return f'results/nuxmv_prism_results_{self.size}{self.prob}.csv'
+        return f'results/no_nuxmv_prism_results_{self.get_size()}{self.prob}.csv'

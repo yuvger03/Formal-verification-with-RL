@@ -11,6 +11,8 @@ from q_learning import Q_Learning
 def main(p, size, index):
     parameters_run = ParametersRun()
     parameters_run.setNewParameters(size)
+    parameters_run.set_prob(p)
+    p = float(p)
     # DictResults = {}
     # DictResults["Converged ,with NuXmv"] = 0
     # DictResults["Did not converged ,with NuXmv"] = 0
@@ -60,4 +62,4 @@ if __name__ == '__main__':
     # for size in [10,15,20]:
     #     for j in range(0,9):
     #         p = 1 - j * 0.05
-    main(float(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
+    main(float(sys.argv[1]), int(sys.argv[2]), str(sys.argv[3]))

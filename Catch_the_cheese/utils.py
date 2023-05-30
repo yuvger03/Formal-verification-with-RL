@@ -246,7 +246,7 @@ def writePrism(size, currentOptimal, q_table, listOfHoles, index, p, probs, useN
         fw.write("P=? [!(F (score>=10))]\n")
 
 
-def runPrism(index, results_file,PR):
+def runPrism(index, results_file, PR):
     size = PR.get_size()
     filename = f'tests/test_t1_{index}.prism'
     props_file = f'tests/test_t1_{index}.props'

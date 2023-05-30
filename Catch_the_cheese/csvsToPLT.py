@@ -3,18 +3,18 @@ import os
 import matplotlib.pyplot as plt
 
 
-def writeData():
+def writeData(folder):
     for i in [1000]:
-        resfile = open(f"resCTC{i}.csv", 'a', newline='')
+        entries = os.listdir(folder)
+        os.chdir(folder)
 
+        resfile = open(f"resCTCNewFolder.csv", 'a', newline='')
         writer = csv.writer(resfile)
-        fileStart = r"tests/nuxmv_prism_results_"
+        fileStart = fr"{folder}/nuxmv_prism_results_"
         # for size in [10]:
         #     for j in range(0, 19):
         #         p = 1 - j * 0.05
         #         file = fileStart + str(size) + str(p) + ".csv"
-        entries = os.listdir(f'tests/{i},5/')
-        os.chdir(f'tests/{i},5/')
         for size in [10, 15, 20, 25, 30, 40]:
             RW(size, entries, writer)
         resfile.close()
@@ -60,6 +60,8 @@ def csvPlot(filename):
     plt.show()
 
 
-csvPlot("resCTC10.csv")
-
+# csvPlot("resCTCNewfolder.csv")
+# writeData("./results")
+# print(os.path.abspath("./resCTCNewFolder.csv"))
+csvPlot("./results/resCTCNewFolder.csv")
 

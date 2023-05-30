@@ -27,6 +27,7 @@ class Q_Learning:
         self.all_episode_rewards = []
         self.useNusmv = PR.get_useNusmv()
         self.probability = probability
+        self.res_file_name = PR.get_file_name()
         self.probs = np.zeros((len(environment.get_state_space()), len(environment.get_action_space())))
 
     def update_probs(self, probability, row):  # get the probability matrix according to the q_table
@@ -119,7 +120,7 @@ class Q_Learning:
                         writePrism(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index,
                                    p=self.probability,
                                    probs=self.probs, useNuxmv=self.useNusmv, PR=self.PR)
-                        runPrism(index, f'tests/nuxmv_prism_results_{self.PR.size}{self.probability}.csv', PR=self.PR)
+                        runPrism(index, self.res_file_name, PR=self.PR)
                 # lose
 
                 if FLAG_win and answer[2] == 0 and answer[3] == 0:
@@ -135,7 +136,7 @@ class Q_Learning:
             if episode % 100 == 0 and episode > 0 and self.useNusmv == 0:  # not using nusmv - just run prism
                 writePrism(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index=index, p=self.probability,
                            probs=self.probs, useNuxmv=self.useNusmv, PR=self.PR)
-                runPrism(index, f'tests/no_nuxmv_prism_results_{self.PR.get_size()}{self.probability}.csv', PR=self.PR)
+                runPrism(index, self.res_file_name, PR=self.PR)
             # print(answer)
             # find convergence
             self.bigChange = np.ndarray.max(np.abs(np.subtract(old_q, self.q_table)))
