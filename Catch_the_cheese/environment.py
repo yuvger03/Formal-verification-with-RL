@@ -45,7 +45,7 @@ class Environment:
         action = Action(action_index)
 
         if self.invalid_action(action):
-            return self.current_state, -10 * self.PR.size * self.PR.size, False
+            return self.current_state, -10000 * self.PR.size * self.PR.size, False
 
         if action == Action.Left:
             self.current_state -= 1
@@ -62,7 +62,7 @@ class Environment:
         if letter == 'C' and self.score >= self.PR.get_score():
             return self.current_state, 10010 * self.PR.size * self.PR.size, True
         else:
-            return self.current_state, -10 * self.PR.size * self.PR.size, True
+            return self.current_state, -100 * self.PR.size * self.PR.size, True
 
     def stochastic_step(self, action_index, probabilityOfStep):
         step = self.probabilityOfSteps(action_index, probabilityOfStep)
@@ -115,13 +115,13 @@ class Environment:
         temp_map = deepcopy(self.map)
         for i in range(0, self.PR.size):
             if self.current_state != i:
-                if (temp_map[i] == 'F'):
+                if temp_map[i] == 'F':
                     print('.', end=" ")
-                if (temp_map[i] == 'H'):
+                elif temp_map[i] == 'H':
                     print('O', end=" ")
-                if (temp_map[i] == 'C'):
+                elif temp_map[i] == 'C':
                     print('C', end=" ")
-                if (temp_map[i] == 'S'):
+                elif temp_map[i] == 'S':
                     print('S', end=" ")
             else:
                 print('X', end=" ")
