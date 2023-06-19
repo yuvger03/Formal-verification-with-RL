@@ -63,7 +63,10 @@ class Q_Learning:
                 if rand < self.exploration_rate:
                     action_index = self.env.get_random_action().value
                 else:
-                    action_index = np.argmax(self.q_table[state, :])
+                    if self.q_table[state, 0] == self.q_table[state, 1]:
+                        action_index = self.env.get_random_action().value
+                    else:
+                        action_index = np.argmax(self.q_table[state, :])
 
                 # new_state, reward, done = self.env.step(action_index)
                 new_state, reward, done = self.env.stochastic_step(action_index, self.probability)

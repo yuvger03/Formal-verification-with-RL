@@ -34,7 +34,7 @@ def writeStart(filename,PR):
         fw.write("};\n")
         fw.write("	score : ")
         lw = '{'
-        for i in range(12):
+        for i in range(PR.get_score() + 2):
             lw = lw + str(i) + ', '
         lw = lw[:-2]
         fw.write(lw)
@@ -88,8 +88,8 @@ def writePlayer(filename, listOfHoles, currentOptimal, Q,PR):
             fw.write(
                 f"               currentPosition = " + str(listOfHoles[i]) + ": " + "{" + str(listOfHoles[i]) + "};\n")
         fw.write(
-            f"               currentPosition = " + str(PR.size - 1) + "&score<9" + ": " + "{" + str(PR.size - 2) + "};\n")
-        fw.write(f"               currentPosition = " + str(PR.size - 1) + "&score>=9: " + "{" + str(PR.size - 1) + "};\n")
+            f"               currentPosition = " + str(PR.size - 1) + f"&score<{PR.get_score()}" + ": " + "{" + str(PR.size - 2) + "};\n")
+        fw.write(f"               currentPosition = " + str(PR.size - 1) + f"&score>={PR.get_score()}: " + "{" + str(PR.size - 1) + "};\n")
         for i in range(PR.size - 1):
             if i not in listOfHoles:
                 bestMove = bestActions(Q[i], i,PR)
@@ -107,12 +107,12 @@ def writePlayer(filename, listOfHoles, currentOptimal, Q,PR):
         fw.write("    esac;\n\n")
         fw.write("    next(score) := case\n")
         fw.write(
-            "               score = score&score<" + str(10) + "&currentPosition=" + str(PR.size - 1) + " : score+1;\n")
+            "               score = score&score<" + str(PR.get_score()) + "&currentPosition=" + str(PR.size - 1) + " : score+1;\n")
         fw.write("               TRUE : score;\n")
         fw.write("    esac;\n\n")
 
         # LTL line
-        fw.write("LTLSPEC !F (score>=10)\n")
+        fw.write(f"LTLSPEC !F (score>={(PR.get_score())})\n")
         # fw.write("LTLSPEC F ((currentPosition ="+str(PR.size*PR.size-1)+")&(score<"+str(int(10*PR.size))+"))\n")
 
 
@@ -156,7 +156,7 @@ def runSmv(index,PR):
             if chunks[i] == 'Counterexample':
                 FLAG = True
             if chunks[i] == 'currentPosition' and FLAG:
-                moveList.append((chunks[i + 2]))
+                moveList.append((chunks[i + 2].strip("'")))
 
     return moveList, True, 0, 0
 
@@ -176,7 +176,7 @@ def writeStartPrism(filename, useNuxmv,PR):
         else:
             fw.write("currentPosition : [0.." + str(size - 1) + "] init " + str(
                 PR.get_start_point()) + " ;\n")
-        fw.write("score : [0.." + str(size + 1) + "] init 0;\n\n")
+        fw.write("score : [0.." + str(PR.get_score() + 1) + "] init 0;\n\n")
 
 
 def writePlayerPrism(filename, list_of_holes, q_table, probs,PR):
@@ -190,9 +190,9 @@ def writePlayerPrism(filename, list_of_holes, q_table, probs,PR):
             fw.write("\t[] currentPosition=" + str(list_of_holes[i]) + " -> ")
             fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
         # got to the end of the grid
-        fw.write("\t[] currentPosition=" + str(size - 1) + "&score<9 -> ")
+        fw.write("\t[] currentPosition=" + str(size - 1) + f"&score<{PR.get_score()} -> ")
         fw.write("(currentPosition'=" + str(size - 2) + ");\n")
-        fw.write("\t[] currentPosition=" + str(size - 1) + "&score>=10 -> ")
+        fw.write("\t[] currentPosition=" + str(size - 1) + f"&score>={PR.get_score()} -> ")
         fw.write("(currentPosition'=" + str(size - 1) + ");\n")
 
         # rest of the states
@@ -214,9 +214,10 @@ def writePlayerPrism(filename, list_of_holes, q_table, probs,PR):
 
         # next score value
         # we didn't reach the end of the grid, and we have steps left
-        str_to_write = "\n\t[] (score<" + str(10) + "&currentPosition=" + str(PR.size - 1) + ") -> (score'=(score + 1));\n"
+        str_to_write = "\n\t[] (score<" + str(PR.get_score()) + ")&(currentPosition=" + str(PR.size - 1) + ") -> (score'=(score + 1));\n"
+        print(PR.get_score())
         # else - we reached the end of the grid, or we don't have steps left
-        str_to_write += ("\t[] (score>=" + str(10) + ")|(currentPosition!=" + str(size - 1)
+        str_to_write += ("\t[] (score>=" + str(PR.get_score()) + ")|(currentPosition!=" + str(size - 1)
                          + ") -> (score'=score);\n\n")
         fw.write(str_to_write)
 
@@ -243,7 +244,7 @@ def writePrism(size, currentOptimal, q_table, listOfHoles, index, p, probs, useN
 
     props_file = f'tests/test_t1_{index}.props'
     with open(props_file, 'w') as fw:
-        fw.write("P=? [!(F (score>=10))]\n")
+        fw.write(f"P=? [(F (score>={PR.get_score()}))]\n")
 
 
 def runPrism(index, results_file, PR):
