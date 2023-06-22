@@ -14,9 +14,9 @@ class Q_Learning:
         self.max_steps_per_episode = parameters.get('max_steps_per_episode', PR.num_steps_in_episode)
         self.learning_rate = parameters.get('learning_rate', 0.1)
         self.discount_rate = parameters.get('discount_rate', 0.99)
-        self.exploration_rate = parameters.get('exploration_rate', 1)
-        self.max_exploration_rate = parameters.get('max_exploration_rate', 1)
-        self.min_exploration_rate = parameters.get('min_exploration_rate', 0.01)
+        self.exploration_rate = parameters.get('exploration_rate', 0)
+        self.max_exploration_rate = parameters.get('max_exploration_rate', 0)
+        self.min_exploration_rate = parameters.get('min_exploration_rate', 0.0)
         self.exploration_decay_rate = parameters.get('exploration_decay_rate', 0.0001)
 
         self.bigChange = 0
@@ -154,6 +154,9 @@ class Q_Learning:
         print(self.episodes)
         writeSmv(self.PR.size, 10000, self.q_table, self.env.get_holes(), index=self.index, PR=self.PR)
         answer = runSmv(self.index, self.PR)
+        writePrism(self.PR.size, 10000, self.q_table, self.env.get_holes(), index=self.index, p=self.probability,
+                   probs=self.probs, useNuxmv=self.useNusmv, PR=self.PR)
+        runPrism(self.index, self.res_file_name, PR=self.PR)
 
         if answer[1] == True:
             print("found something ", len(answer[0]))

@@ -50,5 +50,5 @@ class ParametersRun:
 
     def get_file_name(self):
         if self.useNusmv:
-            return f'results/nuxmv_prism_results_{self.size}{self.prob}.csv'
-        return f'results/no_nuxmv_prism_results_{self.get_size()}{self.prob}.csv'
+            return f'nuxmv_prism_results_{self.size}{self.prob}.csv'
+        return f'no_nuxmv_prism_results_{self.get_size()}{self.prob}.csv'
