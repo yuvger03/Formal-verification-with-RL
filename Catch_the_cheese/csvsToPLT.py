@@ -8,7 +8,7 @@ def writeData(folder, res_file):
         entries = os.listdir(folder)
         os.chdir(folder)
 
-        resfile = open(res_fil, 'a', newline='')
+        resfile = open(res_file, 'a', newline='')
         writer = csv.writer(resfile)
         fileStart = fr"{folder}/nuxmv_prism_results_"
         # for size in [10]:
@@ -52,8 +52,8 @@ def csvPlot(filename):
         plt.plot(probs, data_size[s], '-o', label=str(s))
     plt.legend(title="Size")
     plt.xlabel("p")
-    plt.ylabel("Probability of losing")
-    plt.title(f"Probability of losing vs p")  #  using {filename[6:-4]} iterations
+    plt.ylabel("Probability of convergence")
+    plt.title(f"Probability of convergence vs p")  #  using {filename[6:-4]} iterations
     plt.savefig(filename[:-4] + ".png")
     plt.show()
 

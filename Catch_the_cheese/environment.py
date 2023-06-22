@@ -66,7 +66,8 @@ class Environment:
 
     def stochastic_step(self, action_index, probabilityOfStep):
         step = self.probabilityOfSteps(action_index, probabilityOfStep)
-        return self.step(step)
+        state, reward, done = self.step(step)
+        return state, reward, done, step.value
 
     def probabilityOfSteps(self, action_index, probabilityOfStep):  # returns the probability of the actions
         action = Action(action_index)

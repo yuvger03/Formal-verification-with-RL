@@ -69,7 +69,7 @@ class Q_Learning:
                         action_index = np.argmax(self.q_table[state, :])
 
                 # new_state, reward, done = self.env.step(action_index)
-                new_state, reward, done = self.env.stochastic_step(action_index, self.probability)
+                new_state, reward, done, action_index = self.env.stochastic_step(action_index, self.probability)
 
                 self.q_table[state][action_index] = self.q_table[state][action_index] * (1 - self.learning_rate) + \
                                                     self.learning_rate * (
@@ -179,7 +179,7 @@ class Q_Learning:
             # self.env.print_current_state()
 
             action_index = np.argmax(self.q_table[state, :])
-            new_state, _, done = self.env.stochastic_step(action_index, self.probability)
+            new_state, _, done, _ = self.env.stochastic_step(action_index, self.probability)
             # new_state, _, done = self.env.step(action_index)
             state = new_state
 
