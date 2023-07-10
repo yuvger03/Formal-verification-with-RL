@@ -17,7 +17,7 @@ Q_LEARNING = True
 #############
 Play_Random = True
 check_without_smv = 1
-probability = 0.98
+probability = 0.9
 
 class State:
     def __init__(self, init_vec=None, p1=None, p2=None, max_turns=50, exp_rate=0.1, start_q=0, flg=True):
@@ -46,14 +46,14 @@ class State:
         return None
 
     def availablePositions(self):
-        positions = next_positions(self.player_turn, self.position)
+        positions = next_positions(self.player_turn, self.position,BOARD_COLS)
         return positions
 
-    def probabiltyOfNextState(self, action, probabiltyOfStep):
-        validActions = self.availablePositions()
-        if np.random.uniform(0, 1) < probabiltyOfStep or (len(validActions) == 1 and validActions[0] == action):
-            return action
-        return np.random.choice(validActions)
+    # def probabiltyOfNextState(self, action, probabiltyOfStep):
+    #     validActions = self.availablePositions()
+    #     if np.random.uniform(0, 1) < probabiltyOfStep or (len(validActions) == 1 and validActions[0] == action):
+    #         return action
+    #     return np.random.choice(validActions)
 
     # get unique hash of current board state
     def getHash(self):
@@ -113,7 +113,7 @@ class State:
                 print("smv stops us")
                 return
 
-        if Play_Random or np.random.uniform(0, 1) <= self.exp_rate:
+        if Play_Random or np.random.uniform(0, 1) <= self.exp_rate or np.random.uniform(0, 1) > probability:
             idx = 0
             while idx == 0:
                 idx = np.random.choice(len(a_vecs))
@@ -153,6 +153,7 @@ class State:
                     # p1_action = self.probabiltyOfNextState(p1_action, probability)
                 else:
                     p1_action = self.p1.chooseAction2(positions, self.player_turn, self.position, l_vecs)
+
                 self.updateState(sum(p1_action, []))
                 board_hash = self.getHash()
                 self.p1.addState(board_hash, l_vecs)
@@ -296,7 +297,7 @@ class Player:
             return sum(current_position[np.maximum(0, -pl_turn)], [])
         idx = np.random.choice(len(positions))
         action = positions[idx]
-        if np.random.uniform(0, 1) <= self.exp_rate:
+        if np.random.uniform(0, 1) <= self.exp_rate or np.random.uniform(0,1) > probability:
             # take random action
             idx = np.random.choice(len(positions))
             action = positions[idx]
