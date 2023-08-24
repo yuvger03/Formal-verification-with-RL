@@ -1,0 +1,13 @@
+.idea
+__pycache__
+game
+*.csv
+*.txt
+!requirements.txt
+*.png
+nuXmv
+Dockerfile
+*.smv
+results
+tests
+Images
