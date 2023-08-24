@@ -18,10 +18,10 @@ if __name__ == "__main__":
     counter2 = 0
     flag_smv = True  # true if using smv, false if not
 
-    for round in range(2):
+    for round in range(5):
         if round > 0:
             flag_smv = False
-        max_games = 800
+        max_games = 5000
         numOfPlayers = int(len(InitToNumbers(ret_type=str)) / 2)
         max_turn = 40
         expRate = 0.1

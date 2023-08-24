@@ -3,11 +3,31 @@ import subprocess
 import numpy as np
 import random
 # defines
-BOARD_ROWS = 5
+BOARD_ROWS = 3
 BOARD_COLS = BOARD_ROWS
 # INIT = [[[3, 2], [2, 2]], [[1, 1]]]
-INIT = [[[1, 1], [1, 2]], [[2, 2]]]
+# INIT = [[[1, 1], [1, 2]], [[2, 2]]]
+def r(a):
+    return np.random.randint(1, a+1)
+def initialize_board(boardRows,cpsNum,rbrNum):
+    cpsLst = [None for _ in range(cpsNum)]
+    rbrLst = [None for _ in range(rbrNum)]
+    for i in range(cpsNum):
+        possibleSet = [r(boardRows),r(boardRows)]
+        while possibleSet in cpsLst:
+            possibleSet = [r(boardRows),r(boardRows)]
+        cpsLst[i] = possibleSet
+    for i in range(rbrNum):
+        possibleSet = [r(boardRows),r(boardRows)]
+        while possibleSet in rbrLst or possibleSet in cpsLst:
+            possibleSet = [r(boardRows),r(boardRows)]
+        rbrLst[i] = possibleSet
+    print("cops: ",cpsLst)
+    print("robbers: ",rbrLst)
+    return [cpsLst,rbrLst]
 
+
+INIT = initialize_board(BOARD_ROWS,2,1)
 
 # convert init state to vector
 def InitToNumbers(ret_type):
@@ -411,7 +431,7 @@ def writeSmv(numOfPlayers, max_digit, p1, all_vecs, l_vecs):
 def runSmv():
     smv_file = f'test_t3.smv'
     os.chdir('tests')
-    if os.name is 'nt':
+    if os.name == 'nt':
         output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines()  # on windows
     else:
         output = subprocess.check_output('nuXmv ' + smv_file, shell=True).splitlines()  # on linux
@@ -634,44 +654,44 @@ def runSmv1():
 #     vec_sim = 113221
 #     sim = rotate_vec(vec_sim, 1)
 #     print(sim)
-def writeStartPrism(filename):
-    size = BOARD_ROWS
-    if os.path.exists(filename):
-        os.remove(filename)  # create new file
-
-    # write beginning of prism file
-    with open(filename, 'w') as fw:
-        fw.write("dtmc\n\n")
-        fw.write("module main\n\n")
-        fw.write("currentPosition : [0.." + str(size * size - 1) + "] init 0;\n")
-        fw.write("countSteps : [0.." + str(size * size) + "] init 0;\n\n")
-
-def writePlayerPrism(filename, list_of_holes, q_table, probs):
-    size = BOARD_ROWS
-    if os.path.exists(filename):
-        os.remove(filename)
-
-    with open(filename, 'w') as fw:
-        # next state value
-        for i in range(len(list_of_holes)):  # if we're in a hole, we can't move
-            fw.write("\t[] currentPosition=" + str(list_of_holes[i]) + " -> ")
-            fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
-        # got to the end of the grid
-        fw.write("\t[] currentPosition=" + str(size * size - 1) + " -> ")
-        fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
-
-        # rest of the states
-        for i in range(size * size - 1):
-            if i not in list_of_holes:  # not a hole
-                valid, pos = validActions(i)  # get the valid actions and the next positions
-                # create the string to write to the file
-                str_to_write = "\t[] currentPosition=" + str(i) + " -> "
-                if sum([probs[i][action] for action in valid]) == 0:  # all is zero - we didn't visit this state
-                     for action in valid:
-                        str_to_write += (
-                                str(float(1) / len(valid)) + " : (currentPosition'=" + str(pos[action]) + ") + ")
-                else:
-                    for action in valid:
-                        str_to_write += (str(probs[i][action]) + " : (currentPosition'=" + str(pos[action]) + ") + ")
-                str_to_write = str_to_write[:-3] + ";\n"
-                fw.write(str_to_write)
+# def writeStartPrism(filename):
+#     size = BOARD_ROWS
+#     if os.path.exists(filename):
+#         os.remove(filename)  # create new file
+#
+#     # write beginning of prism file
+#     with open(filename, 'w') as fw:
+#         fw.write("dtmc\n\n")
+#         fw.write("module main\n\n")
+#         fw.write("currentPosition : [0.." + str(size * size - 1) + "] init 0;\n")
+#         fw.write("countSteps : [0.." + str(size * size) + "] init 0;\n\n")
+#
+# def writePlayerPrism(filename, list_of_holes, q_table, probs):
+#     size = BOARD_ROWS
+#     if os.path.exists(filename):
+#         os.remove(filename)
+#
+#     with open(filename, 'w') as fw:
+#         # next state value
+#         for i in range(len(list_of_holes)):  # if we're in a hole, we can't move
+#             fw.write("\t[] currentPosition=" + str(list_of_holes[i]) + " -> ")
+#             fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
+#         # got to the end of the grid
+#         fw.write("\t[] currentPosition=" + str(size * size - 1) + " -> ")
+#         fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
+#
+#         # rest of the states
+#         for i in range(size * size - 1):
+#             if i not in list_of_holes:  # not a hole
+#                 valid, pos = validActions(i)  # get the valid actions and the next positions
+#                 # create the string to write to the file
+#                 str_to_write = "\t[] currentPosition=" + str(i) + " -> "
+#                 if sum([probs[i][action] for action in valid]) == 0:  # all is zero - we didn't visit this state
+#                      for action in valid:
+#                         str_to_write += (
+#                                 str(float(1) / len(valid)) + " : (currentPosition'=" + str(pos[action]) + ") + ")
+#                 else:
+#                     for action in valid:
+#                         str_to_write += (str(probs[i][action]) + " : (currentPosition'=" + str(pos[action]) + ") + ")
+#                 str_to_write = str_to_write[:-3] + ";\n"
+#                 fw.write(str_to_write)
