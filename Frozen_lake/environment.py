@@ -58,7 +58,7 @@ class Environment:
             self.map[i * self.SIZE + self.SIZE - 1] = 'F'
             if i + self.SIZE - 1 in self.index_hole:
                 self.index_hole.remove(i * self.SIZE + self.SIZE - 1)
-        self.map[(self.SIZE) * self.SIZE - 1] = 'H'
+        self.map[(self.SIZE) * self.SIZE - 1] = 'G'
 
         self.action_space = np.array([Action.Left, Action.Right, Action.Up, Action.Down])
         self.state_space = [i for i in range(np.array(self.map).size)]
@@ -138,7 +138,8 @@ class Environment:
     def stochastic_step(self, action_index, probabilityOfStep):
         action = Action(action_index)
         action = self.probabiltyOfNextState(action, probabilityOfStep)
-        return self.step(action)
+        state, reward, done = self.step(action.value)
+        return state, reward, done, action.value
 
     def invalid_action(self, action):
         if (action == Action.Left and self.current_state % self.SIZE == 0) or \

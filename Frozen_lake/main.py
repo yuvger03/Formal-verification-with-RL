@@ -45,23 +45,25 @@ def main(p, learning_rate, index, discount_factor):
             q_learning_algo = Q_Learning(frozen_lake_environment, learning_rate, discount_factor, p)
             if i < switch:
                 q_learning_algo.setuseNusmv(1)
-                file_name = f'tests/nuxmv_prism_results_{parameters_run.get_size()}{p}.csv'
+                file_name = f'results/nuxmv_prism_results_{parameters_run.get_size()}{p}.csv'
             else:  # i >= switch
                 q_learning_algo.setuseNusmv(0)
-                file_name = f'tests/no_nuxmv_prism_results_{parameters_run.get_size()}{p}.csv'
+                file_name = f'results/no_nuxmv_prism_results_{parameters_run.get_size()}{p}.csv'
+
+            q_learning_algo.setFileName(file_name)
 
             prism_results = open(file_name, 'a', newline='')
             writer_prism = csv.writer(prism_results)
             writer_prism.writerow([f"size = {parameters_run.get_size()} & num_games = {i}"])
             prism_results.close()
 
-            q_learning_algo.run_algorithm(p, index)
+            q_learning_algo.run_algorithm(index)
 
             Q = q_learning_algo.getQ()
             H = frozen_lake_environment.get_holes()
 
             # q_learning_algo.print_results()
-            success, e = q_learning_algo.run_and_print_latest_iteration(p)
+            success, e = q_learning_algo.run_and_print_latest_iteration(p, index)
             if success == 0 and i >= switch:
                 if s == 0:
                     size10[3] += 1
@@ -107,6 +109,7 @@ def main(p, learning_rate, index, discount_factor):
     plt.ylabel("Number of games")
     plt.title(str(num_games) + " games of frozen lake for boards: " + str1 + " " + str2)
     plt.legend()
+    plt.savefig("results/" + str(num_games) + " games of frozen lake for boards: " + str1 + " " + str2 + ".png")
     plt.show()
 
 
@@ -116,6 +119,6 @@ if __name__ == '__main__':
     discount_rate = 0.92
     alpha = 0.2  # learning rate
     index = sys.argv[2]
-    main(float(prob), float(alpha), index, discount_factor=discount_rate)
+    main(prob, float(alpha), index, discount_factor=discount_rate)
     print(float(prob))
     print("time:" + str(time.time() - start_time))

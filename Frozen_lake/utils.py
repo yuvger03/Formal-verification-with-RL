@@ -193,7 +193,7 @@ def runSmv(index):
     SIZE = parameters_run.get_size()
     smv_file = f'test_t1_{index}.smv'
     os.chdir('tests')
-    if os.name is 'nt':
+    if os.name == 'nt':
         output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines() #on windows
     else:
         output = subprocess.check_output('nuXmv '+ smv_file, shell=True).splitlines() #on linux
@@ -277,7 +277,7 @@ def writePlayerPrism(filename, list_of_holes, q_table, probs):
             fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
         # got to the end of the grid
         fw.write("\t[] currentPosition=" + str(size * size - 1) + " -> ")
-        fw.write("(currentPosition'=" + str(list_of_holes[i]) + ");\n")
+        fw.write("(currentPosition'=" + str(size * size - 1) + ");\n")
 
         # rest of the states
         for i in range(size * size - 1):
@@ -327,8 +327,8 @@ def writePrism(size, currentOptimal, q_table, listOfHoles, index, probs):
 
     props_file = f'tests/test_t1_{index}.props'
     with open(props_file, 'w') as fw:
-        fw.write("P=? [!(F ((currentPosition =" + str(size * size - 1) + ")&(countSteps<" + str(
-            currentOptimal - 1) + ")))]\n")
+        fw.write("P=? [(F ((currentPosition =" + str(size * size - 1) + ")))]\n")
+        #  + ")&(countSteps<" + str(currentOptimal - 1)
 
 
 def runPrism(index, results_file):
@@ -348,3 +348,13 @@ def runPrism(index, results_file):
 
 
 
+def checkSameValArr(arr):
+    """
+    check if all the values in the array are the same
+    :param arr: our array
+    :return: boolean - True if all the values are the same, False otherwise
+    """
+    for i in range(len(arr) - 1):
+        if arr[i] != arr[i + 1]:
+            return False
+    return True

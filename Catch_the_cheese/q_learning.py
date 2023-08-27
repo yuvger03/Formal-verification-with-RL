@@ -120,10 +120,9 @@ class Q_Learning:
                                                                        self.q_table[int(new_state),
                                                                        :])) + 10000000 * self.PR.size * self.PR.size
                         self.update_probs(self.probability, int(n_state))
-                        writePrism(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index,
-                                   p=self.probability,
-                                   probs=self.probs, useNuxmv=self.useNusmv, PR=self.PR)
-                        runPrism(index, self.res_file_name, PR=self.PR)
+                writePrism(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index, p=self.probability,
+                           probs=self.probs, useNuxmv=self.useNusmv, PR=self.PR)
+                runPrism(index, self.res_file_name, PR=self.PR)
                 # lose
 
                 if FLAG_win and answer[2] == 0 and answer[3] == 0:
