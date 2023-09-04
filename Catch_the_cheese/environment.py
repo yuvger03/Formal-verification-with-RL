@@ -11,8 +11,7 @@ from parameters_run import ParametersRun
 NUM_HOLES = 1
 
 
-class Environment:
-
+class Environment:  # the environment of the game
     def __init__(self, PR=None):
         self.PR = PR
         # write the map
@@ -42,6 +41,11 @@ class Environment:
         return np.random.choice(self.action_space)
 
     def step(self, action_index):
+        """
+        step function
+        :param action_index:
+        :return:
+        """
         action = Action(action_index)
 
         if self.invalid_action(action):
@@ -65,11 +69,23 @@ class Environment:
             return self.current_state, -100 * self.PR.size * self.PR.size, True
 
     def stochastic_step(self, action_index, probabilityOfStep):
+        """
+        stochastic step function
+        :param action_index:
+        :param probabilityOfStep:
+        :return:
+        """
         step = self.probabilityOfSteps(action_index, probabilityOfStep)
         state, reward, done = self.step(step)
         return state, reward, done, step.value
 
     def probabilityOfSteps(self, action_index, probabilityOfStep):  # returns the probability of the actions
+        """
+        probability of the actions
+        :param action_index:
+        :param probabilityOfStep:
+        :return:
+        """
         action = Action(action_index)
         validActions = self.get_valid_actions()
         if np.random.uniform(0, 1) < probabilityOfStep or (len(validActions) == 1 and validActions[0] == action):
@@ -116,13 +132,13 @@ class Environment:
         temp_map = deepcopy(self.map)
         for i in range(0, self.PR.size):
             if self.current_state != i:
-                if temp_map[i] == 'F':
+                if temp_map[i] == 'F':  # F = floor
                     print('.', end=" ")
-                elif temp_map[i] == 'H':
+                elif temp_map[i] == 'H':  # H = hole
                     print('O', end=" ")
-                elif temp_map[i] == 'C':
+                elif temp_map[i] == 'C':  # C = cheese
                     print('C', end=" ")
-                elif temp_map[i] == 'S':
+                elif temp_map[i] == 'S':  # S = start
                     print('S', end=" ")
             else:
                 print('X', end=" ")

@@ -6,6 +6,12 @@ import parameters_run
 
 
 def validActions(user_po,PR):
+    """
+    get the valid actions for the agent
+    :param user_po:
+    :param PR:
+    :return:
+    """
     size = PR.get_size()
     valid = []
     pos = [0 for i in range(2)]
@@ -20,6 +26,12 @@ def validActions(user_po,PR):
 
 
 def writeStart(filename,PR):
+    """
+    write the beginning of the smv file
+    :param filename:
+    :param PR:
+    :return:
+    """
     if os.path.exists(filename):
         os.remove(filename)  # create new file
 
@@ -51,6 +63,13 @@ def writeStart(filename,PR):
 
 
 def bestActions(q_line, user_po,PR):
+    """
+    get the best actions for the agent
+    :param q_line:
+    :param user_po:
+    :param PR:
+    :return:
+    """
     actionList = []
     bestactionlist = []
 
@@ -63,6 +82,13 @@ def bestActions(q_line, user_po,PR):
 
 
 def legalActions(index, user_po,PR):
+    """
+    check if the action is legal
+    :param index:
+    :param user_po:
+    :param PR:
+    :return:
+    """
     # the actions that are illegal:
     #   can't go up once you are at top of board
     #   can't go down once you are at bottom of board
@@ -79,6 +105,15 @@ def legalActions(index, user_po,PR):
 
 
 def writePlayer(filename, listOfHoles, currentOptimal, Q,PR):
+    """
+    write the player part of the smv file
+    :param filename:
+    :param listOfHoles:
+    :param currentOptimal:
+    :param Q:
+    :param PR:
+    :return:
+    """
     if os.path.exists(filename):
         os.remove(filename)
 
@@ -118,6 +153,16 @@ def writePlayer(filename, listOfHoles, currentOptimal, Q,PR):
 
 # main function of writing the smv file
 def writeSmv(SIZE, currentOptimal, Q, listOfHoles, index,PR):
+    """
+    write the smv file
+    :param SIZE:
+    :param currentOptimal:
+    :param Q:
+    :param listOfHoles:
+    :param index:
+    :param PR:
+    :return:
+    """
     filename_main = f"tests/test_t1_{index}.smv"
     if os.path.exists(filename_main):
         os.remove(filename_main)
@@ -137,6 +182,12 @@ def writeSmv(SIZE, currentOptimal, Q, listOfHoles, index,PR):
 
 # run smv file and check the result
 def runSmv(index,PR):
+    """
+    run the smv file
+    :param index:
+    :param PR:
+    :return:
+    """
     smv_file = f"test_t1_{index}.smv"
     os.chdir('tests')
     if os.name == 'nt':
@@ -162,6 +213,13 @@ def runSmv(index,PR):
 
 
 def writeStartPrism(filename, useNuxmv,PR):
+    """
+    write the start of the prism file
+    :param filename:
+    :param useNuxmv:
+    :param PR:
+    :return:
+    """
     size = PR.get_size()
     if os.path.exists(filename):
         os.remove(filename)  # create new file
@@ -180,6 +238,15 @@ def writeStartPrism(filename, useNuxmv,PR):
 
 
 def writePlayerPrism(filename, list_of_holes, q_table, probs,PR):
+    """
+    write the player part of the prism file
+    :param filename:
+    :param list_of_holes:
+    :param q_table:
+    :param probs:
+    :param PR:
+    :return:
+    """
     size = PR.get_size()
     if os.path.exists(filename):
         os.remove(filename)
@@ -225,6 +292,19 @@ def writePlayerPrism(filename, list_of_holes, q_table, probs,PR):
 
 
 def writePrism(size, currentOptimal, q_table, listOfHoles, index, p, probs, useNuxmv,PR):
+    """
+    write the prism file
+    :param size:
+    :param currentOptimal:
+    :param q_table:
+    :param listOfHoles:
+    :param index:
+    :param p:
+    :param probs:
+    :param useNuxmv:
+    :param PR:
+    :return:
+    """
     size = PR.get_size()
     filename_main = f'tests/test_t1_{index}.prism'
     if os.path.exists(filename_main):
@@ -248,6 +328,13 @@ def writePrism(size, currentOptimal, q_table, listOfHoles, index, p, probs, useN
 
 
 def runPrism(index, results_file, PR):
+    """
+    run prism on the file
+    :param index:
+    :param results_file:
+    :param PR:
+    :return:
+    """
     size = PR.get_size()
     filename = f'tests/test_t1_{index}.prism'
     props_file = f'tests/test_t1_{index}.props'

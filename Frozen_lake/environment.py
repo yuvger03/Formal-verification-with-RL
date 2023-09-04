@@ -17,7 +17,7 @@ import parameters_run
 
 class Environment:
 
-    def __init__(self):
+    def __init__(self):  # initialize the environment
         self.SIZE = parameters_run.get_size()
         # self.SIZE=self.self.SIZE
         # write the map
@@ -77,10 +77,10 @@ class Environment:
     def get_random_action(self):
         return np.random.choice(self.action_space)
 
-    def step(self, action_index):
+    def step(self, action_index):  # take an action and return the next state, reward, and done
         action = Action(action_index)
 
-        if self.invalid_action(action):
+        if self.invalid_action(action):  # if the action is invalid, return the current state, -10, and done
             return self.current_state, -10 * self.SIZE * self.SIZE, False
 
         if action == Action.Left:
@@ -94,16 +94,18 @@ class Environment:
 
         letter = self.map[self.current_state]
 
-        if letter == 'S':
+        if letter == 'S':  # if the next state is the start state, return the current state, -10, and done
             return self.current_state, -10 * self.SIZE * self.SIZE, False
-        if letter == 'F':
+        if letter == 'F':  # if the next state is a frozen state, return the current state, -1, and done
             return self.current_state, -self.SIZE, False
-        elif letter == 'G':
+        elif letter == 'G':  # if the next state is the goal state, return the current state, 100, and done
             return self.current_state, 100 * self.SIZE * self.SIZE, True
-        else:
+        else:  # if the next state is a hole, return the current state, -10, and done
             return self.current_state, -10 * self.SIZE * self.SIZE, True
 
-    def valid_actions_of_state(self, state):
+    def valid_actions_of_state(self, state=None):
+        if not state:
+            state = self.current_state
         valid_actions = []
         for action in self.action_space:
             if not self.invalid_action_of_state(action, state):
@@ -119,16 +121,30 @@ class Environment:
             return True
 
         return False
-
-    def valid_actions(self):
-        valid_actions = []
-        for action in self.action_space:
-            if not self.invalid_action(action):
-                valid_actions.append(action)
-        return valid_actions
+    # def invalid_action(self, action):
+    #     if (action == Action.Left and self.current_state % self.SIZE == 0) or \
+    #             (action == Action.Right and self.current_state % (self.SIZE) == (self.SIZE - 1)) or \
+    #             (action == Action.Up and self.current_state < self.SIZE) or \
+    #             (action == Action.Down and (
+    #                     self.SIZE * self.SIZE - self.SIZE) <= self.current_state and self.current_state <= self.SIZE * self.SIZE - 1):
+    #         return True
+    #
+    #     return False
+    # def valid_actions(self, state):
+    #     valid_actions = []
+    #     for action in self.action_space:
+    #         if not self.invalid_action(action):
+    #             valid_actions.append(action)
+    #     return valid_actions
 
     def probabiltyOfNextState(self, action, probabilityOfStep):
-        validActions = self.valid_actions()
+        """
+        take an action and return the next state, reward, and done
+        :param action:
+        :param probabilityOfStep:
+        :return:
+        """
+        validActions = self.valid_actions_of_state()
         if np.random.uniform(0, 1) < probabilityOfStep or (len(validActions) == 1 and validActions[0] == action):
             return action
         if action in validActions:
@@ -136,20 +152,16 @@ class Environment:
         return np.random.choice(validActions)
 
     def stochastic_step(self, action_index, probabilityOfStep):
+        """
+        take an action in a certein and return the next state, reward, and done
+        :param action_index:
+        :param probabilityOfStep:
+        :return:
+        """
         action = Action(action_index)
         action = self.probabiltyOfNextState(action, probabilityOfStep)
         state, reward, done = self.step(action.value)
         return state, reward, done, action.value
-
-    def invalid_action(self, action):
-        if (action == Action.Left and self.current_state % self.SIZE == 0) or \
-                (action == Action.Right and self.current_state % (self.SIZE) == (self.SIZE - 1)) or \
-                (action == Action.Up and self.current_state < self.SIZE) or \
-                (action == Action.Down and (
-                        self.SIZE * self.SIZE - self.SIZE) <= self.current_state and self.current_state <= self.SIZE * self.SIZE - 1):
-            return True
-
-        return False
 
     def reset(self):
         self.current_state = 0
@@ -159,13 +171,13 @@ class Environment:
         temp_map = deepcopy(self.map)
         for i in range(0, self.SIZE * self.SIZE):
             if self.current_state != i:
-                if (temp_map[i] == 'F'):
+                if temp_map[i] == 'F':
                     print('.', end=" ")
-                if (temp_map[i] == 'H'):
+                if temp_map[i] == 'H':
                     print('O', end=" ")
-                if (temp_map[i] == 'G'):
+                if temp_map[i] == 'G':
                     print('G', end=" ")
-                if (temp_map[i] == 'S'):
+                if temp_map[i] == 'S':
                     print('S', end=" ")
             else:
                 print('X', end=" ")

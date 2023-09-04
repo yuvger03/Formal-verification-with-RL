@@ -18,11 +18,9 @@ class Q_Learning:
         self.max_exploration_rate = parameters.get('max_exploration_rate', 0)
         self.min_exploration_rate = parameters.get('min_exploration_rate', 0.0)
         self.exploration_decay_rate = parameters.get('exploration_decay_rate', 0.0001)
-
         self.bigChange = 0
         self.epsilon = 0.0000000000000000000000000001
         self.episodes = 0
-
         self.q_table = np.zeros((len(environment.get_state_space()), len(environment.get_action_space())))
         self.all_episode_rewards = []
         self.useNusmv = PR.get_useNusmv()
@@ -30,7 +28,13 @@ class Q_Learning:
         self.res_file_name = PR.get_file_name()
         self.probs = np.zeros((len(environment.get_state_space()), len(environment.get_action_space())))
 
-    def update_probs(self, probability, row):  # get the probability matrix according to the q_table
+    def update_probs(self, probability, row):
+        """
+        get the probability matrix according to the q_table
+        :param probability:
+        :param row:
+        :return:
+        """
         valid_actions = [action.value for action in self.env.valid_actions_of_state(row)]  # get the valid actions
         best_action = valid_actions[np.argmax(self.q_table[row, valid_actions])]  # get best valid action from q_table
         valid_actions.remove(best_action)  # remove the best action from the valid actions
@@ -46,6 +50,11 @@ class Q_Learning:
         self.useNusmv = value
 
     def run_algorithm(self, index=1):
+        """
+        run the q-learning algorithm
+        :param index:
+        :return:
+        """
         # FLAG_win shows wheter smv found a solution or not and what solution
         FLAG_win = False
         # maxSteps shows which number of steps we need to take to win 
@@ -58,18 +67,16 @@ class Q_Learning:
             state = self.env.reset()
 
             old_q = self.q_table.copy()
-            for step in range(self.max_steps_per_episode):
+            for step in range(self.max_steps_per_episode): # for each step in the episode
                 rand = random.uniform(0, 1)
-                if rand < self.exploration_rate:
+                if rand < self.exploration_rate or self.q_table[state, 0] == self.q_table[state, 1]:
                     action_index = self.env.get_random_action().value
                 else:
-                    if self.q_table[state, 0] == self.q_table[state, 1]:
-                        action_index = self.env.get_random_action().value
-                    else:
-                        action_index = np.argmax(self.q_table[state, :])
+                    action_index = np.argmax(self.q_table[state, :])
 
                 # new_state, reward, done = self.env.step(action_index)
                 new_state, reward, done, action_index = self.env.stochastic_step(action_index, self.probability)
+                # get the new state, reward and done from the environment
 
                 self.q_table[state][action_index] = self.q_table[state][action_index] * (1 - self.learning_rate) + \
                                                     self.learning_rate * (
@@ -96,8 +103,8 @@ class Q_Learning:
                 writeSmv(self.PR.size, maxSteps, self.q_table, self.env.get_holes(), index=index, PR=self.PR)
                 answer = runSmv(index=index, PR=self.PR)
 
-                if answer[1]:
-                    print("found something ", len(answer[0]))
+                if answer[1]: # if we found a solution
+                    print("found something ", len(answer[0]))  # print the solution
                     FLAG_win = True
                     maxSteps = len(answer[0])
 
@@ -125,7 +132,7 @@ class Q_Learning:
                 runPrism(index, self.res_file_name, PR=self.PR)
                 # lose
 
-                if FLAG_win and answer[2] == 0 and answer[3] == 0:
+                if FLAG_win and answer[2] == 0 and answer[3] == 0: # if we found a solution and it is not a dead end
                     # print("dead")
                     print(finalAnswer)
                     print("length of answer ", len(finalAnswer))
@@ -173,6 +180,10 @@ class Q_Learning:
         print()
 
     def run_and_print_latest_iteration(self):
+        """
+        run the latest iteration of the q-learning algorithm
+        :return:
+        """
         state = self.env.reset()
         for step in range(100):
             # self.env.print_current_state()

@@ -188,27 +188,32 @@ def writeSmv(SIZE, currentOptimal, Q, listOfHoles, index):
                 fw.write(line)
 
 
-# run smv file and check the result
+
 def runSmv(index):
+    """
+    # run smv file and check the result
+    :param index:
+    :return:
+    """
     SIZE = parameters_run.get_size()
     smv_file = f'test_t1_{index}.smv'
     os.chdir('tests')
-    if os.name == 'nt':
+    if os.name == 'nt': # windows
         output = subprocess.check_output(['nuXmv', smv_file], shell=True).splitlines() #on windows
-    else:
+    else: # linux / mac
         output = subprocess.check_output('nuXmv '+ smv_file, shell=True).splitlines() #on linux
-    os.chdir('../')
+    os.chdir('../') # return to main directory
     ans = str(output[26][47:])[2:]
     ans = ans[0:len(ans) - 1]
     moveList = list()
     print(output)
 
-    if 'false' in str(output):
-        loop_vecs = str(b''.join(output))
+    if 'false' in str(output): # if we found a counterexample
+        loop_vecs = str(b''.join(output)) # convert output to string
         chunks = loop_vecs.split(' ')
         FLAG = False
-        for i in range(len(chunks)):
-            if chunks[i] == 'Counterexample':
+        for i in range(len(chunks)): # find the counterexample
+            if chunks[i] == 'Counterexample': # found the counterexample
                 FLAG = True
             if chunks[i] == 'currentPosition' and FLAG:
                 moveList.append(chunks[i + 2])
@@ -216,7 +221,7 @@ def runSmv(index):
         TorF = True
         step = -1
         state = -1
-        for i in range(len(moveList)):
+        for i in range(len(moveList)): # translate the counterexample to a list of moves
             if moveList[i] in setOfMoves:
                 state = i - 1
                 if int(moveList[i - 1]) - int(moveList[i]) == 1:
@@ -253,6 +258,11 @@ def runSmv(index):
 
 # PRISM
 def writeStartPrism(filename):
+    """
+    # write the start of the prism file
+    :param filename:
+    :return:
+    """
     size = parameters_run.get_size()
     if os.path.exists(filename):
         os.remove(filename)  # create new file
@@ -266,6 +276,14 @@ def writeStartPrism(filename):
 
 
 def writePlayerPrism(filename, list_of_holes, q_table, probs):
+    """
+    # write the player part of the prism file
+    :param filename:
+    :param list_of_holes:
+    :param q_table:
+    :param probs:
+    :return:
+    """
     size = parameters_run.get_size()
     if os.path.exists(filename):
         os.remove(filename)
@@ -280,7 +298,7 @@ def writePlayerPrism(filename, list_of_holes, q_table, probs):
         fw.write("(currentPosition'=" + str(size * size - 1) + ");\n")
 
         # rest of the states
-        for i in range(size * size - 1):
+        for i in range(size * size - 1): # for each state
             if i not in list_of_holes:  # not a hole
                 valid, pos = validActions(i)  # get the valid actions and the next positions
                 # create the string to write to the file
@@ -308,6 +326,16 @@ def writePlayerPrism(filename, list_of_holes, q_table, probs):
 
 
 def writePrism(size, currentOptimal, q_table, listOfHoles, index, probs):
+    """
+    # write the whole prism file
+    :param size:
+    :param currentOptimal:
+    :param q_table:
+    :param listOfHoles:
+    :param index:
+    :param probs:
+    :return:
+    """
     size = parameters_run.get_size()
     filename_main = f'tests/test_t1_{index}.prism'
     if os.path.exists(filename_main):
@@ -332,6 +360,12 @@ def writePrism(size, currentOptimal, q_table, listOfHoles, index, probs):
 
 
 def runPrism(index, results_file):
+    """
+    run prism on the file
+    :param index:
+    :param results_file:
+    :return:
+    """
     size = parameters_run.get_size()
     filename = f'tests/test_t1_{index}.prism'
     props_file = f'tests/test_t1_{index}.props'
